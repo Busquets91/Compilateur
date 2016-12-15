@@ -23,7 +23,14 @@ public class Analyseur {
 	
 	public Arbre getArbre() throws Exception{
 		this.symb.push();
-		return function();
+		Arbre a = function();
+		for(Arbre f : a.fils){
+			if(f.tok.Value.equals("main") && f.fils.get(0).fils.isEmpty()){
+				return a;
+			}
+		}
+		System.err.println("FONCTION \"main\" MANQUANTE OU AVEC TROP D'ARGUMENT");
+		throw new Exception();
 	}
 	
 	private Boolean strIsToken(String tokenClasse){
