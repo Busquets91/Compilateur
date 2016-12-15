@@ -32,5 +32,7 @@ public enum TokenClass {
 	TOK_PV,
 	TOK_SUIT,
 	TOK_AND,
-	TOK_OR
+	TOK_OR,
+	TOK_FUNC,
+	TOK_RAC
 }

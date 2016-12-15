@@ -236,7 +236,7 @@ public class CodeGenerator {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Reader fic = new Reader("/home/tp-home004/apoint1/workspace/Compilateur.zip_expanded/Compilateur/Analyseur/src/test.txt");
+		Reader fic = new Reader("/home/tp-home004/apoint1/workspace/Compilateur/src/test.txt");
 		Analyseur anal = new Analyseur(fic.getString());
 		
 		Arbre tst = anal.getArbre();

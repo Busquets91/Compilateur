@@ -1,5 +1,22 @@
-var i;
-while(i < 5 && i > 2 || 3 < 5){
-	var a;
+function main(alexis, vivien, prof){
+	var i;
+	while(i < 5 && i > 2 || 3 < 5){
+		var a;
+	}
 }
+
+function test1(){
+	var j;
+	while(j < 5 && j > 2 || 3 < 5){
+		var b;
+	}
+}
+
+function yo(busquets){
+	var o;
+	while(o < 5 && o > 2 || 3 < 5){
+		var r;
+	}
+}
+
 

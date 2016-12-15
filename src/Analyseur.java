@@ -6,10 +6,10 @@ public class Analyseur {
 	private TableSymbole symb;
 	private String string;
 	private int pos;
-	private String[] keyWords = {"if", "for", "while", "var", "int", "else"};
-	private TokenClass[] keyClasse = {TokenClass.TOK_IF, TokenClass.TOK_FOR, TokenClass.TOK_WHILE, TokenClass.TOK_VAR, TokenClass.TOK_INT, TokenClass.TOK_ELSE};
-	private String[] operator = {"&&", "||", "+=", "-=", "*=", "/=", "+", "-", "*", "/", "%", "(", ")", "==", "!=", ">=", "<=", ">", "<", "=", "{", "}", ";"};
-	private TokenClass[] keyOperator = {TokenClass.TOK_AND, TokenClass.TOK_OR, TokenClass.TOK_ADDE, TokenClass.TOK_LESSE, TokenClass.TOK_MULTE, TokenClass.TOK_DIVE, TokenClass.TOK_ADD, TokenClass.TOK_LESS,TokenClass.TOK_MULT, TokenClass.TOK_DIV, TokenClass.TOK_MOD, TokenClass.TOK_PO, TokenClass.TOK_PF, TokenClass.TOK_EQA, TokenClass.TOK_DIFF, TokenClass.TOK_SUPE, TokenClass.TOK_INFE, TokenClass.TOK_SUP, TokenClass.TOK_INF, TokenClass.TOK_AFF, TokenClass.TOK_AO, TokenClass.TOK_AF, TokenClass.TOK_PV};
+	private String[] keyWords = {"if", "for", "while", "var", "int", "else", "function"};
+	private TokenClass[] keyClasse = {TokenClass.TOK_IF, TokenClass.TOK_FOR, TokenClass.TOK_WHILE, TokenClass.TOK_VAR, TokenClass.TOK_INT, TokenClass.TOK_ELSE, TokenClass.TOK_FUNC};
+	private String[] operator = {"&&", "||", "+", "-", "*", "/", "%", "(", ")", "==", "!=", ">=", "<=", ">", "<", "=", "{", "}", ";"};
+	private TokenClass[] keyOperator = {TokenClass.TOK_AND, TokenClass.TOK_OR, TokenClass.TOK_ADD, TokenClass.TOK_LESS,TokenClass.TOK_MULT, TokenClass.TOK_DIV, TokenClass.TOK_MOD, TokenClass.TOK_PO, TokenClass.TOK_PF, TokenClass.TOK_EQA, TokenClass.TOK_DIFF, TokenClass.TOK_SUPE, TokenClass.TOK_INFE, TokenClass.TOK_SUP, TokenClass.TOK_INF, TokenClass.TOK_AFF, TokenClass.TOK_AO, TokenClass.TOK_AF, TokenClass.TOK_PV};
 	
 	public Analyseur(String str){
 		this.string = str;
@@ -23,7 +23,7 @@ public class Analyseur {
 	
 	public Arbre getArbre() throws Exception{
 		this.symb.push();
-		return instruction();
+		return function();
 	}
 	
 	private Boolean strIsToken(String tokenClasse){
@@ -103,18 +103,18 @@ public class Analyseur {
 				Token tmp = new Token();
 				tmp.Classe = TokenClass.TOK_LESS;
 				tmp.Value = "-";
-				Arbre a = new Arbre(tmp, new ArrayList<Arbre>());
+				Arbre a = new Arbre(tmp);
 				a.fils.add(neg);
 				return a;
 			}
-			return new Arbre(next(), new ArrayList<Arbre>());
+			return new Arbre(next());
 		}
 		if(look().Classe == TokenClass.TOK_INT){
-			return new Arbre(next(), new ArrayList<Arbre>());
+			return new Arbre(next());
 		}
 		if(look().Classe == TokenClass.TOK_IDENT){
 			if (symb.search(look().Value) != null){
-				return new Arbre(next(), new ArrayList<Arbre>());
+				return new Arbre(next());
 			}
 			else{
 				System.err.println("VARIABLE " + look().Value + " NON DECLARE");
@@ -122,7 +122,7 @@ public class Analyseur {
 			}
 		}
 		if(look().Classe != TokenClass.TOK_PO){
-			return new Arbre(new Token(), new ArrayList<Arbre>());
+			return new Arbre(new Token());
 		}
 		pos ++;
 		Arbre res = expression();
@@ -133,16 +133,16 @@ public class Analyseur {
 		else if(res.tok.Classe != TokenClass.TOK_NULL ){
 			return res;
 		}
-		return new Arbre(new Token(), new ArrayList<Arbre>());
+		return new Arbre(new Token());
 	}
 	
 	private Arbre multiplieur() throws Exception{
 		Arbre p = primitive();
 		if(p.tok.Classe == TokenClass.TOK_NULL){
-			return new Arbre(new Token(), new ArrayList<Arbre>());
+			return new Arbre(new Token());
 		}
 		if(look().Classe == TokenClass.TOK_MULT || look().Classe == TokenClass.TOK_DIV){
-			Arbre a = new Arbre(next(), new ArrayList<Arbre>());
+			Arbre a = new Arbre(next());
 			Arbre b = multiplieur();
 			if (b.tok.Classe != TokenClass.TOK_NULL){
 				a.fils.add(p);
@@ -158,10 +158,10 @@ public class Analyseur {
 	private Arbre additive() throws Exception{
 		Arbre p = multiplieur();
 		if(p.tok.Classe == TokenClass.TOK_NULL){
-			return new Arbre(new Token(), new ArrayList<Arbre>());
+			return new Arbre(new Token());
 		}
 		if(look().Classe == TokenClass.TOK_ADD || look().Classe == TokenClass.TOK_LESS){
-			Arbre a = new Arbre(next(), new ArrayList<Arbre>());
+			Arbre a = new Arbre(next());
 			Arbre b = additive();
 			if (b.tok.Classe != TokenClass.TOK_NULL){
 				a.fils.add(p);
@@ -177,12 +177,12 @@ public class Analyseur {
 	private Arbre comparative() throws Exception{
 		Arbre p = additive();
 		if(p.tok.Classe == TokenClass.TOK_NULL){
-			return new Arbre(new Token(), new ArrayList<Arbre>());
+			return new Arbre(new Token());
 		}
 		if(look().Classe == TokenClass.TOK_EQA || look().Classe == TokenClass.TOK_DIFF 
 				|| look().Classe == TokenClass.TOK_SUPE || look().Classe == TokenClass.TOK_INFE
 				|| look().Classe == TokenClass.TOK_SUP || look().Classe == TokenClass.TOK_INF){
-			Arbre a = new Arbre(next(), new ArrayList<Arbre>());
+			Arbre a = new Arbre(next());
 			Arbre b = additive();
 			if (b.tok.Classe != TokenClass.TOK_NULL){
 				a.fils.add(p);
@@ -198,10 +198,10 @@ public class Analyseur {
 	private Arbre logical() throws Exception{
 		Arbre p = comparative();
 		if(p.tok.Classe == TokenClass.TOK_NULL){
-			return new Arbre(new Token(), new ArrayList<Arbre>());
+			return new Arbre(new Token());
 		}
 		if(look().Classe == TokenClass.TOK_AND || look().Classe == TokenClass.TOK_OR){
-			Arbre a = new Arbre(next(), new ArrayList<Arbre>());
+			Arbre a = new Arbre(next());
 			Arbre b = logical();
 			if (b.tok.Classe != TokenClass.TOK_NULL){
 				a.fils.add(p);
@@ -221,9 +221,9 @@ public class Analyseur {
 	private Arbre affectation() throws Exception{
 		if(look().Classe == TokenClass.TOK_IDENT){
 			if (symb.search(look().Value) != null){
-				Arbre ident = new Arbre(next(), new ArrayList<Arbre>());
+				Arbre ident = new Arbre(next());
 				if(look().Classe == TokenClass.TOK_AFF){
-					Arbre affect = new Arbre(next(), new ArrayList<Arbre>());
+					Arbre affect = new Arbre(next());
 					Arbre exp = expression();
 					if (exp.tok.Classe != TokenClass.TOK_NULL){
 						affect.fils.add(ident);
@@ -240,12 +240,54 @@ public class Analyseur {
 				throw new Exception();
 			}
 		}
-		return new Arbre(new Token(), new ArrayList<Arbre>());		
+		return new Arbre(new Token());		
+	}
+	
+	private Arbre function() throws Exception{
+		Arbre funcs = new Arbre(new Token(TokenClass.TOK_RAC, "ORIGIN"));
+		Arbre func = new Arbre(new Token());
+		do{
+			func = new Arbre(new Token());
+			if(next().Classe == TokenClass.TOK_FUNC && look().Classe == TokenClass.TOK_IDENT){
+				func = new Arbre(new Token(TokenClass.TOK_FUNC, next().Value));
+				if (next().Classe == TokenClass.TOK_PO){
+					Arbre vars = new Arbre(new Token(TokenClass.TOK_VAR, "var"));
+					while(look().Classe != TokenClass.TOK_PF){
+						Token ident = next();
+						if (ident.Classe == TokenClass.TOK_IDENT){
+							vars.fils.add(new Arbre(ident));
+						}
+					}
+					next();
+					if (next().Classe == TokenClass.TOK_AO){
+						Arbre content = instruction();
+						if (content.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_AF){
+							func.fils.add(vars);
+							func.fils.add(content);
+							funcs.fils.add(func);
+						}
+						else{
+							System.err.println("ERREUR DANS CONTENU FONCTION");
+							throw new Exception();
+						}
+					}
+					else{
+						System.err.println("ERREUR APRES DECLARATION VARIABLES FONCTION");
+						throw new Exception();
+					}
+				}
+				else{
+					System.err.println("ERREUR APRES DECLARATION FONCTION");
+					throw new Exception();
+				}
+			}
+		}while(func.tok.Classe != TokenClass.TOK_NULL);
+		return funcs;
 	}
 	
 	private Arbre instruction() throws Exception{
-		Arbre seq = new Arbre(new Token(TokenClass.TOK_SUIT, " => "), new ArrayList<Arbre>());
-		Arbre instr = new Arbre(new Token(), new ArrayList<Arbre>());
+		Arbre seq = new Arbre(new Token(TokenClass.TOK_SUIT, " => "));
+		Arbre instr = new Arbre(new Token());
 		do{
 			//AFFECTATION
 			instr = affectation();
@@ -261,9 +303,9 @@ public class Analyseur {
 			else{
 				//DECLARATION
 				if(look().Classe == TokenClass.TOK_VAR){
-					instr = new Arbre(next(), new ArrayList<Arbre>());
+					instr = new Arbre(next());
 					if(look().Classe == TokenClass.TOK_IDENT){
-						instr.fils.add(new Arbre(next(), new ArrayList<Arbre>()));
+						instr.fils.add(new Arbre(next()));
 						if (next().Classe == TokenClass.TOK_PV){
 							if (symb.searchSameLevel(instr.fils.get(0).tok.Value) == null){
 								symb.define(instr.fils.get(0).tok.Value);
@@ -287,7 +329,7 @@ public class Analyseur {
 				else{
 					//CONDITION
 					if(look().Classe == TokenClass.TOK_IF){
-						instr = new Arbre(next(), new ArrayList<Arbre>());
+						instr = new Arbre(next());
 						if(next().Classe == TokenClass.TOK_PO){
 							Arbre exp = expression();
 							if(exp.tok.Classe != TokenClass.TOK_NULL){
@@ -335,7 +377,7 @@ public class Analyseur {
 					else{
 						//BOUCLE FOR
 						if(look().Classe == TokenClass.TOK_FOR){
-							instr = new Arbre(next(), new ArrayList<Arbre>());
+							instr = new Arbre(next());
 							if(next().Classe == TokenClass.TOK_PO){
 								Arbre aff = affectation();
 								if(aff.tok.Classe != TokenClass.TOK_NULL){
@@ -347,7 +389,7 @@ public class Analyseur {
 												symb.push();
 												Arbre instrBloc = instruction();
 												if(instrBloc.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_AF){
-													Arbre instrIf = new Arbre(new Token(TokenClass.TOK_IF, "if"), new ArrayList<Arbre>());
+													Arbre instrIf = new Arbre(new Token(TokenClass.TOK_IF, "if"));
 													instr.fils.add(aff);
 													instr.fils.add(instrIf);
 													instrBloc.fils.add(instrFor);
@@ -389,15 +431,15 @@ public class Analyseur {
 						else{
 							//BOUCLE WHILE
 							if(look().Classe == TokenClass.TOK_WHILE){
-								instr = new Arbre(next(), new ArrayList<Arbre>());
+								instr = new Arbre(next());
 								if(next().Classe == TokenClass.TOK_PO){
 									Arbre condition = expression();
 									if(condition.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_PF && next().Classe == TokenClass.TOK_AO){
 										symb.push();
 										Arbre instrBloc = instruction();
 										if(instrBloc.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_AF){
-											Arbre instrIf = new Arbre(new Token(TokenClass.TOK_IF, "if"), new ArrayList<Arbre>());
-											instr.fils.add(new Arbre(new Token(), new ArrayList<Arbre>()));
+											Arbre instrIf = new Arbre(new Token(TokenClass.TOK_IF, "if"));
+											instr.fils.add(new Arbre(new Token()));
 											instr.fils.add(instrIf);
 											instrIf.fils.add(condition);
 											instrIf.fils.add(instrBloc);						
@@ -423,7 +465,7 @@ public class Analyseur {
 					}
 				}
 			}
-		}while(instr.tok.Classe != TokenClass.TOK_NULL);
+		}while(instr.tok.Classe != TokenClass.TOK_NULL && look().Classe != TokenClass.TOK_AF);
 		return seq;
 	}
 	

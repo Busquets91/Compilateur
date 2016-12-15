@@ -7,10 +7,10 @@ public class Arbre {
 	public ArrayList<Arbre> fils;
 	public Arbre next;
 	
-	public Arbre(Token t, ArrayList<Arbre> f){
+	public Arbre(Token t){
 		tok = t;
 		next = null;
-		fils = f;
+		fils = new ArrayList<Arbre>();
 	}
 	
 	public String print(){
