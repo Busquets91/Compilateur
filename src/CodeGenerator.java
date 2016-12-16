@@ -112,38 +112,18 @@ public class CodeGenerator {
 	}
 	
 	protected void addAdd(Arbre a){
-		if (isInt(a.fils.get(0)) && isInt(a.fils.get(1))){
-			addLineCode("push.i "+a.fils.get(0).tok.Value);
-			addLineCode("push.i "+a.fils.get(1).tok.Value);
-			addLineCode("add.i");
-		}
-		else{
-			if (!isInt(a.fils.get(0)) && !isInt(a.fils.get(1))){
-				genCode(a.fils.get(0));
-				genCode(a.fils.get(1));
-			}
-			else if (!isInt(a.fils.get(0))){
-				genCode(a.fils.get(0));
-				addLineCode("push.i "+a.fils.get(1).tok.Value);
-			}
-			else if (!isInt(a.fils.get(1))){
-				genCode(a.fils.get(1));
-				addLineCode("push.i "+a.fils.get(0).tok.Value);
-				
-			}
-			addLineCode("add.i");
-		}		
+		addOperand("add", a);
 	}
 	
 	protected void addSub(Arbre a){
-		addLineCode("sub.i "+a.fils.get(0).tok.Value+", "+a.fils.get(1).tok.Value);
+		addOperand("sub", a);
 	}
 	
-	protected void addMult(Arbre a){
+	protected void addOperand(String op, Arbre a){
 		if (isInt(a.fils.get(0)) && isInt(a.fils.get(1))){
 			addLineCode("push.i "+a.fils.get(0).tok.Value);
 			addLineCode("push.i "+a.fils.get(1).tok.Value);
-			addLineCode("mul.i");
+			addLineCode(op+".i");
 		}
 		else{
 			if (!isInt(a.fils.get(0)) && !isInt(a.fils.get(1))){
@@ -159,8 +139,12 @@ public class CodeGenerator {
 				addLineCode("push.i "+a.fils.get(0).tok.Value);
 				
 			}
-			addLineCode("mul.i");
-		}	
+			addLineCode(op+".i");
+		}
+	}
+	
+	protected void addMult(Arbre a){
+		addOperand("mul", a);
 	}
 	
 	protected void addDiv(Arbre a){
@@ -175,13 +159,11 @@ public class CodeGenerator {
 	}
 	
 	protected void addAnd(Arbre a){
-		//if (a.fils.get(0).tok == TokenClass.TOK_ADD)
-		addLineCode("and "+a.fils.get(0).tok.Value+", "+a.fils.get(1).tok.Value);
+		addOperand("and", a);
 	}
 	
 	protected void addOr(Arbre a){
-		//if (a.fils.get(0).tok == TokenClass.TOK_ADD)
-		addLineCode("or "+a.fils.get(0).tok.Value+", "+a.fils.get(1).tok.Value);
+		addOperand("or", a);
 	}
 	
 	protected void addLoop(Arbre a){
