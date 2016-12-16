@@ -1,0 +1,6 @@
+function main(){
+	var j;
+	j = 3 + 2 * 1 + 5 * 7;
+}
+
+

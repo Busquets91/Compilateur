@@ -73,6 +73,14 @@ public class TableSymbole {
 		}
 	}
 	
+	public Stack<HashMap<Integer, Symbole>> getPile(){
+		return pile;
+	}
+	
+	public int getRang(){
+		return rang;
+	}
+	
 	public static void main(String[] args) throws Exception {
 		TableSymbole tbl = new TableSymbole();
 		tbl.push();

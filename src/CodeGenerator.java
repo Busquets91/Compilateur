@@ -1,3 +1,5 @@
+import java.util.HashMap;
+import java.util.Stack;
 
 public class CodeGenerator {
 	protected TableSymbole symbole;
@@ -27,6 +29,26 @@ public class CodeGenerator {
 		addLabel("halt");
 	}
 	
+	protected void addSymb(){
+		/*Stack<HashMap<Integer, Symbole>> pile = new Stack<HashMap<Integer, Symbole>>();
+		pile = symbole.getPile();
+		
+		for(HashMap<Integer, Symbole> hm : pile){
+			System.out.println("-------------------");
+			for (Integer key : hm.keySet()){
+				System.out.println(hm.get(key).getIdent());
+				System.out.println(symbole.getRang());
+			}
+		}*/
+	}
+	
+	protected boolean isInt(Arbre a){
+		if(a.tok.Classe == TokenClass.TOK_INT || a.tok.Classe == TokenClass.TOK_IDENT){
+			return true;
+		}
+		return false;
+	}
+	
 	protected void addIf(Arbre ifTree){
 		//On crée le label
 		String labelIf = "if"+nbIf;
@@ -38,22 +60,22 @@ public class CodeGenerator {
 		addLineCode("push.i B");
 		switch (ifTree.fils.get(0).tok.Classe){
 			case TOK_EQA: 	//==
-				addLineCode("cmpeq.i "+"A"+" B");
+				addLineCode("cmpeq.i");
 				break;
 			case TOK_DIFF:	//!=
-				addLineCode("cmpne.i "+"A"+" B");
+				addLineCode("cmpne.i");
 				break;
 			case TOK_INF:	//<
-				addLineCode("cmplt.i "+"A"+" B");
+				addLineCode("cmplt.i");
 				break;
 			case TOK_INFE:	//<=
-				addLineCode("cmple.i "+"A"+" B");
+				addLineCode("cmple.i");
 				break;
 			case TOK_SUP:	//>
-				addLineCode("cmpgt.i "+"A"+" B");
+				addLineCode("cmpgt.i");
 				break;
 			case TOK_SUPE:	//>=
-				addLineCode("cmpge.i "+"A"+" B");
+				addLineCode("cmpge.i");
 				break;
 			default:
 				break;
@@ -77,18 +99,40 @@ public class CodeGenerator {
 	}
 	
 	protected void addVar(Arbre a){
-		addLineCode("On ajoute "+a.fils.get(0).tok.Value);
+		//System.out.println(a.fils.get(0).tok.Value);
+		addLineCode("push.i "+"idX");
 	}
 	
 	protected void addAff(Arbre a){
 		//On lance la partie à droite de l'affectation
 		genCode(a.fils.get(1));
-		addLineCode("affectation.i "+a.fils.get(0).tok.Value);
+		addLineCode("affectation "+a.fils.get(0).tok.Value);
+		addLineCode("push.i "+"valX");
+		addLineCode("get "+"idX");
 	}
 	
 	protected void addAdd(Arbre a){
-		//if (a.fils.get(0).tok == TokenClass.TOK_ADD)
-		addLineCode("add.i "+a.fils.get(0).tok.Value+", "+a.fils.get(1).tok.Value);
+		if (isInt(a.fils.get(0)) && isInt(a.fils.get(1))){
+			addLineCode("push.i "+a.fils.get(0).tok.Value);
+			addLineCode("push.i "+a.fils.get(1).tok.Value);
+			addLineCode("add.i");
+		}
+		else{
+			if (!isInt(a.fils.get(0)) && !isInt(a.fils.get(1))){
+				genCode(a.fils.get(0));
+				genCode(a.fils.get(1));
+			}
+			else if (!isInt(a.fils.get(0))){
+				genCode(a.fils.get(0));
+				addLineCode("push.i "+a.fils.get(1).tok.Value);
+			}
+			else if (!isInt(a.fils.get(1))){
+				genCode(a.fils.get(1));
+				addLineCode("push.i "+a.fils.get(0).tok.Value);
+				
+			}
+			addLineCode("add.i");
+		}		
 	}
 	
 	protected void addSub(Arbre a){
@@ -96,21 +140,27 @@ public class CodeGenerator {
 	}
 	
 	protected void addMult(Arbre a){
-		for(Arbre tmp : a.fils){
-			if (tmp.tok.Classe == TokenClass.TOK_INT || tmp.tok.Classe == TokenClass.TOK_VAR){
-				addLineCode("mul.i "+tmp.tok.Value+", "+tmp.tok.Value);
-			}
-			else{
-				genCode(tmp);
-			}
-		}
-		
-		/*if (a.fils.get(1).tok.Classe == TokenClass.TOK_INT || a.fils.get(1).tok.Classe == TokenClass.TOK_VAR){
-			addLineCode("mul.i "+a.fils.get(0).tok.Value+", "+a.fils.get(1).tok.Value);
+		if (isInt(a.fils.get(0)) && isInt(a.fils.get(1))){
+			addLineCode("push.i "+a.fils.get(0).tok.Value);
+			addLineCode("push.i "+a.fils.get(1).tok.Value);
+			addLineCode("mul.i");
 		}
 		else{
-			genCode(a.fils.get(1));
-		}*/
+			if (!isInt(a.fils.get(0)) && !isInt(a.fils.get(1))){
+				genCode(a.fils.get(0));
+				genCode(a.fils.get(1));
+			}
+			else if (!isInt(a.fils.get(0))){
+				genCode(a.fils.get(0));
+				addLineCode("push.i "+a.fils.get(1).tok.Value);
+			}
+			else if (!isInt(a.fils.get(1))){
+				genCode(a.fils.get(1));
+				addLineCode("push.i "+a.fils.get(0).tok.Value);
+				
+			}
+			addLineCode("mul.i");
+		}	
 	}
 	
 	protected void addDiv(Arbre a){
@@ -146,22 +196,22 @@ public class CodeGenerator {
 		addLabel(labelLoop);
 		switch (a.fils.get(1).fils.get(0).tok.Classe){
 			case TOK_EQA: 	//==
-				addLineCode("cmpeq.i "+"A"+" B");
+				addLineCode("cmpeq.i");
 				break;
 			case TOK_DIFF:	//!=
-				addLineCode("cmpne.i "+"A"+" B");
+				addLineCode("cmpne.i");
 				break;
 			case TOK_INF:	//<
-				addLineCode("cmplt.i "+"A"+" B");
+				addLineCode("cmplt.i");
 				break;
 			case TOK_INFE:	//<=
-				addLineCode("cmple.i "+"A"+" B");
+				addLineCode("cmple.i");
 				break;
 			case TOK_SUP:	//>
-				addLineCode("cmpgt.i "+"A"+" B");
+				addLineCode("cmpgt.i");
 				break;
 			case TOK_SUPE:	//>=
-				addLineCode("cmpge.i "+"A"+" B");
+				addLineCode("cmpge.i");
 				break;
 			default:
 				break;
@@ -173,12 +223,28 @@ public class CodeGenerator {
 		addLabel(labelEnd);
 	}
 	
+	protected void addValue(Arbre a){
+		//addLineCode("push.i "+a.tok.Value);
+	}
+	
+	protected void addNumber(Arbre a){
+		//addLineCode("push.i "+a.tok.Value);
+	}
+	
 	protected void genCode(Arbre a){
 		switch (a.tok.Classe){
+			case TOK_RAC:
+				genCode(a.fils.get(0));
+				break;
+			case TOK_FUNC: //TODO gérer les fonctions
+				genCode(a.fils.get(1));
 			case TOK_SUIT:
+				addSymb();	//TODO ajouter var rang n
 				for(Arbre tmp : a.fils){
+					//System.out.println("fils");
 					genCode(tmp);
 				}
+				//TODO supprimer variable rang n
 				break;
 			case TOK_IF:
 				addIf(a);
@@ -208,10 +274,16 @@ public class CodeGenerator {
 				addLoop(a);
 				break;
 			case TOK_VAR:
-				addVar(a);
+				//addVar(a);
 				break;
 			case TOK_AFF:
 				addAff(a);
+				break;
+			case TOK_IDENT:
+				addValue(a);
+				break;
+			case TOK_INT:
+				addValue(a);
 				break;
 			default:
 				break;
@@ -236,14 +308,15 @@ public class CodeGenerator {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Reader fic = new Reader("/home/tp-home004/apoint1/workspace/Compilateur/src/test.txt");
+		Reader fic = new Reader("test.txt");
 		Analyseur anal = new Analyseur(fic.getString());
 		
 		Arbre tst = anal.getArbre();
+		System.out.println(tst.print());
 		CodeGenerator code = new CodeGenerator(tst, anal.getSymb());
 		code.constructCode();
 		System.out.println(code.getCode());
-		System.out.println(tst.print());
+		
 	}
 
 }
