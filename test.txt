@@ -1,6 +1,4 @@
 function main(){
 	var j;
-	j = 3 - 2;
+	j = 2 + 3 ;
 }
-
-

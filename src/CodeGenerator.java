@@ -1,6 +1,8 @@
-import java.util.HashMap;
-import java.util.Stack;
-
+/**
+ * 
+ * @author Vivien BLUM vivien.blum@u-psud.fr
+ *
+ */
 public class CodeGenerator {
 	protected TableSymbole symbole;
 	protected Arbre arbre;
@@ -49,6 +51,121 @@ public class CodeGenerator {
 		return false;
 	}
 	
+	/**
+	 * @desc Check if the value is 0
+	 * @param Arbre a
+	 * @return boolean:	true : zero 
+	 * 					false: not zero
+	 * @deprecated
+	 */
+	protected boolean isZero(Arbre a){
+		System.out.println("bite");
+		return false;
+	}
+	
+	/**
+	 * @desc Check if the last value insert in the stack is 0
+	 * @return boolean:	true : zero 
+	 * 					false: not zero
+	 * @deprecated
+	 */
+	protected boolean isFirstElementZero(){
+		// dépiler la valeur
+		return false;
+	}
+	
+	/**
+	 * @desc Génère du code : Si le dernier élément de la pile est 0
+	 * 							=> On jump à la fin du programme
+	 * @deprecated
+	 */
+	protected void checkIsLastElementIsZero(){
+		
+	}
+	
+	/**
+	 * @desc	Génère du code : push la valeur de la variable
+	 * @param 	a [Arbre] de type int ou ident
+	 */
+	protected void push(Arbre a){
+		/*switch (a.tok.Classe){
+			case TOK_INT:
+				addLineCode("push.i "+a.tok.Value);
+				break;
+			case TOK_IDENT:
+				addLineCode("push.i "+a.tok.Value);
+				break;
+			default:
+				break;
+		}*/
+		addLineCode("push.i "+a.tok.Value);
+	}
+	
+	/**
+	 * @desc	Génère du code : - push pour un int
+	 * 							 - get pour un ident
+	 * @param 	a [Arbre] de type int ou ident
+	 */
+	protected void pushElement(Arbre a){
+		switch (a.tok.Classe){
+			case TOK_INT:
+				push(a);
+				//addLineCode("push.i "+a.tok.Value);
+				break;
+			case TOK_IDENT:
+				get(a);
+				//addLineCode("push.i "+a.tok.Value);
+				break;
+			default:
+				break;
+		}
+	}
+	
+	/**
+	 * @desc	Génère du code : get la valeur de la variable à l'indice précisé
+	 * @param 	a [Arbre] de type ident
+	 */
+	protected void get(Arbre a){
+		//TODO récupérer l'ident de la variable
+		addLineCode("get "+"ident "+a.tok.Value);
+	}
+	
+	/**
+	 * @desc	Génère du code : set la valeur de la variable à l'indice précisé
+	 * @param 	a [Arbre] de type ident
+	 */
+	protected void set(Arbre a){
+		//TODO récupérer l'ident de la variable
+		addLineCode("set "+"ident "+a.tok.Value);
+	}
+	
+	protected String getComparaison(Arbre a){
+		String str = "";
+		switch (a.tok.Classe){
+			case TOK_EQA: 	//==
+				str = "cmpeq";
+				break;
+			case TOK_DIFF:	//!=
+				str = "cmpne";
+				break;
+			case TOK_INF:	//<
+				str = "cmplt";
+				break;
+			case TOK_INFE:	//<=
+				str = "cmple";
+				break;
+			case TOK_SUP:	//>
+				str = "cmpgt";
+				break;
+			case TOK_SUPE:	//>=
+				str = "cmpge";
+				break;
+			default:
+				break;
+		}
+		return str;
+	}
+	
 	protected void addIf(Arbre ifTree){
 		//On crée le label
 		String labelIf = "if"+nbIf;
@@ -56,30 +173,9 @@ public class CodeGenerator {
 		String labelEnd = "endIf"+nbIf;
 		nbIf++;
 		
-		addLineCode("push.i A");	//Push ou get ?
-		addLineCode("push.i B");
-		switch (ifTree.fils.get(0).tok.Classe){
-			case TOK_EQA: 	//==
-				addLineCode("cmpeq.i");
-				break;
-			case TOK_DIFF:	//!=
-				addLineCode("cmpne.i");
-				break;
-			case TOK_INF:	//<
-				addLineCode("cmplt.i");
-				break;
-			case TOK_INFE:	//<=
-				addLineCode("cmple.i");
-				break;
-			case TOK_SUP:	//>
-				addLineCode("cmpgt.i");
-				break;
-			case TOK_SUPE:	//>=
-				addLineCode("cmpge.i");
-				break;
-			default:
-				break;
-		}
+		//On ajoute la comparaison
+		genCode(ifTree.fils.get(0));
+
 		if (ifTree.fils.size() >= 3){
 			addLineCode("jumpf "+labelElse);
 		}
@@ -99,16 +195,14 @@ public class CodeGenerator {
 	}
 	
 	protected void addVar(Arbre a){
-		//System.out.println(a.fils.get(0).tok.Value);
-		addLineCode("push.i "+"idX");
+		push(a.fils.get(0));
 	}
 	
 	protected void addAff(Arbre a){
 		//On lance la partie à droite de l'affectation
 		genCode(a.fils.get(1));
-		addLineCode("affectation "+a.fils.get(0).tok.Value);
-		addLineCode("push.i "+"valX");
-		addLineCode("get "+"idX");
+		set(a.fils.get(0));
+		
 	}
 	
 	protected void addAdd(Arbre a){
@@ -119,10 +213,15 @@ public class CodeGenerator {
 		addOperand("sub", a);
 	}
 	
+	/**
+	 * @desc Ecrit le code pour les opérandes : +, -, *, /, &&, ||
+	 * @param op [String] Opérateur : add, sub, mul, div, and, or
+	 * @param a [Arbre]
+	 */
 	protected void addOperand(String op, Arbre a){
 		if (isInt(a.fils.get(0)) && isInt(a.fils.get(1))){
-			addLineCode("push.i "+a.fils.get(0).tok.Value);
-			addLineCode("push.i "+a.fils.get(1).tok.Value);
+			pushElement(a.fils.get(0));
+			pushElement(a.fils.get(1));
 			addLineCode(op+".i");
 		}
 		else{
@@ -132,11 +231,11 @@ public class CodeGenerator {
 			}
 			else if (!isInt(a.fils.get(0))){
 				genCode(a.fils.get(0));
-				addLineCode("push.i "+a.fils.get(1).tok.Value);
+				pushElement(a.fils.get(1));
 			}
 			else if (!isInt(a.fils.get(1))){
 				genCode(a.fils.get(1));
-				addLineCode("push.i "+a.fils.get(0).tok.Value);
+				pushElement(a.fils.get(0));
 				
 			}
 			addLineCode(op+".i");
@@ -148,16 +247,32 @@ public class CodeGenerator {
 	}
 	
 	protected void addDiv(Arbre a){
-		//TODO addOperand + verif div par zero
-		for(Arbre tmp : a.fils){
-			if (tmp.tok.Classe == TokenClass.TOK_INT || tmp.tok.Classe == TokenClass.TOK_VAR){
-				addLineCode("div.i "+tmp.tok.Value+", "+tmp.tok.Value);
+		//TODO addOperand + verif div par zero + exception
+		String op = "div";
+		if (isInt(a.fils.get(0)) && isInt(a.fils.get(1))){
+			//Num
+			pushElement(a.fils.get(0));
+			//Denum
+			pushElement(a.fils.get(1));
+			addLineCode(op+".i");
+		}
+		else{
+			if (!isInt(a.fils.get(0)) && !isInt(a.fils.get(1))){
+				genCode(a.fils.get(0));
+				genCode(a.fils.get(1));
 			}
-			else{
-				genCode(tmp);
+			else if (!isInt(a.fils.get(0))){
+				genCode(a.fils.get(0));
+				pushElement(a.fils.get(1));
 			}
+			else if (!isInt(a.fils.get(1))){
+				genCode(a.fils.get(1));
+				pushElement(a.fils.get(0));
+			}
+			addLineCode(op+".i");
 		}
 	}
+	
 	
 	protected void addAnd(Arbre a){
 		addOperand("and", a);
@@ -167,39 +282,26 @@ public class CodeGenerator {
 		addOperand("or", a);
 	}
 	
+	protected void addComp(Arbre a){
+		pushElement(a.fils.get(0));
+		pushElement(a.fils.get(1));
+		addLineCode(getComparaison(a)+".i");
+	}
+	
 	protected void addLoop(Arbre a){
 		//On traite la première action si c'est un for
 		if (a.tok.Classe == TokenClass.TOK_FOR){
 			addAff(a.fils.get(0));
 		}
 		//On labelise
-		String labelLoop = "loop"+nbIf;
-		String labelEnd = "endLoop"+nbIf;
+		String labelLoop = "loop"+nbLoop;
+		String labelEnd = "endLoop"+nbLoop;
 		nbLoop++;
 		addLabel(labelLoop);
-		//TODO function addComparaison
-		switch (a.fils.get(1).fils.get(0).tok.Classe){
-			case TOK_EQA: 	//==
-				addLineCode("cmpeq.i");
-				break;
-			case TOK_DIFF:	//!=
-				addLineCode("cmpne.i");
-				break;
-			case TOK_INF:	//<
-				addLineCode("cmplt.i");
-				break;
-			case TOK_INFE:	//<=
-				addLineCode("cmple.i");
-				break;
-			case TOK_SUP:	//>
-				addLineCode("cmpgt.i");
-				break;
-			case TOK_SUPE:	//>=
-				addLineCode("cmpge.i");
-				break;
-			default:
-				break;
-		}
+				
+		//On lance la comparaison
+		genCode(a.fils.get(1).fils.get(0));
+
 		addLineCode("jumpf "+labelEnd);
 		genCode(a.fils.get(1).fils.get(1));
 		addLineCode("jump "+labelLoop);
@@ -207,23 +309,31 @@ public class CodeGenerator {
 		addLabel(labelEnd);
 	}
 	
+	/**
+	 * 
+	 * @deprecated 
+	 */
 	protected void addValue(Arbre a){
-		//addLineCode("push.i "+a.tok.Value);
 	}
 	
+	/**
+	 * 
+	 * 
+	 */
 	protected void addNumber(Arbre a){
-		//addLineCode("push.i "+a.tok.Value);
+		pushElement(a);
 	}
 	
 	protected void genCode(Arbre a){
 		switch (a.tok.Classe){
-			case TOK_RAC:
+			//Gestion du code
+			case TOK_RAC: 	//Racine du fichier
 				genCode(a.fils.get(0));
 				break;
-			case TOK_FUNC: //TODO gérer les fonctions
+			case TOK_FUNC: //Fonctions //TODO gérer les fonctions
 				genCode(a.fils.get(1));
 				break;
-			case TOK_SUIT:
+			case TOK_SUIT:	//Séquence
 				//TODO ajouter var rang n
 				addSymb();	
 				for(Arbre tmp : a.fils){
@@ -231,44 +341,66 @@ public class CodeGenerator {
 				}
 				//TODO supprimer variable rang n
 				break;
-			case TOK_IF:
-				addIf(a);
-				break;
-			case TOK_ADD:
+			//Operand
+			case TOK_ADD:	// +
 				addAdd(a);
 				break;
-			case TOK_LESS:
+			case TOK_LESS:	// -
 				addSub(a);
 				break;
-			case TOK_MULT:
+			case TOK_MULT:	// *
 				addMult(a);
 				break;
-			case TOK_DIV:
+			case TOK_DIV:	// /
 				addDiv(a);
 				break;
-			case TOK_AND:
+			case TOK_AND:	// &&
 				addAnd(a);
 				break;
-			case TOK_OR:
+			case TOK_OR:	// ||
 				addOr(a);
 				break;
-			case TOK_FOR:
+			//Operand comparaison
+			case TOK_EQA: 	// ==
+				addComp(a);
+				break;
+			case TOK_DIFF:	// !=
+				addComp(a);
+				break;
+			case TOK_INF:	// <
+				addComp(a);
+				break;
+			case TOK_INFE:	// <=
+				addComp(a);
+				break;
+			case TOK_SUP:	// >
+				addComp(a);
+				break;
+			case TOK_SUPE:	// >=
+				addComp(a);
+				break;
+			//Boucles & conditions
+			case TOK_IF:	// If
+				addIf(a);
+				break;
+			case TOK_FOR:	// Loop : for
 				addLoop(a);
 				break;
-			case TOK_WHILE:
+			case TOK_WHILE: // Loop : while
 				addLoop(a);
 				break;
-			case TOK_VAR:
-				//addVar(a);
+			//Gestion des variables
+			case TOK_VAR:	// var
+				addVar(a);
 				break;
-			case TOK_AFF:
+			case TOK_AFF:	// =
 				addAff(a);
 				break;
 			case TOK_IDENT:
 				addValue(a);
 				break;
 			case TOK_INT:
-				addValue(a);
+				addNumber(a);
 				break;
 			default:
 				break;
@@ -278,7 +410,6 @@ public class CodeGenerator {
 	public void constructCode(){
 		setStart();
 		
-		//TODO ajouter les variables à la table des symboles (Construction de la pile)
 		genCode(arbre);
 		
 		setEnd();
@@ -289,14 +420,22 @@ public class CodeGenerator {
 	}
 
 	public static void main(String[] args) throws Exception {
+		//On lit le fichier contenant le code
 		Reader fic = new Reader("test.txt");
+		
+		//On l'analyse
 		Analyseur anal = new Analyseur(fic.getString());
 		
 		Arbre tst = anal.getArbre();
 		System.out.println(tst.print());
+		
+		//On génère le code
 		CodeGenerator code = new CodeGenerator(tst, anal.getSymb());
 		code.constructCode();
 		System.out.println(code.getCode());
+		
+		//On écrit le code dans un fichier
+		new Writer(fic.getNameFile()+"-compiled.txt", code.getCode());
 		
 	}
 

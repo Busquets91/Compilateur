@@ -1,0 +1,7 @@
+.start
+push.i j
+push.i 2
+push.i 3
+add.i
+set ident j
+.halt
