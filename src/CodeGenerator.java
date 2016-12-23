@@ -148,6 +148,7 @@ public class CodeGenerator {
 	}
 	
 	protected void addDiv(Arbre a){
+		//TODO addOperand + verif div par zero
 		for(Arbre tmp : a.fils){
 			if (tmp.tok.Classe == TokenClass.TOK_INT || tmp.tok.Classe == TokenClass.TOK_VAR){
 				addLineCode("div.i "+tmp.tok.Value+", "+tmp.tok.Value);
@@ -176,6 +177,7 @@ public class CodeGenerator {
 		String labelEnd = "endLoop"+nbIf;
 		nbLoop++;
 		addLabel(labelLoop);
+		//TODO function addComparaison
 		switch (a.fils.get(1).fils.get(0).tok.Classe){
 			case TOK_EQA: 	//==
 				addLineCode("cmpeq.i");
@@ -220,10 +222,11 @@ public class CodeGenerator {
 				break;
 			case TOK_FUNC: //TODO gérer les fonctions
 				genCode(a.fils.get(1));
+				break;
 			case TOK_SUIT:
-				addSymb();	//TODO ajouter var rang n
+				//TODO ajouter var rang n
+				addSymb();	
 				for(Arbre tmp : a.fils){
-					//System.out.println("fils");
 					genCode(tmp);
 				}
 				//TODO supprimer variable rang n
@@ -277,10 +280,6 @@ public class CodeGenerator {
 		
 		//TODO ajouter les variables à la table des symboles (Construction de la pile)
 		genCode(arbre);
-		
-		//TODO parcourir l'arbre
-		
-			//TODO gérer tous les token : for, if ...
 		
 		setEnd();
 	}
