@@ -288,6 +288,16 @@ public class CodeGenerator {
 		addLineCode(getComparaison(a)+".i");
 	}
 	
+	protected void addFunc(Arbre a){
+		if (a.tok.Value.equals("main")){
+			genCode(a.fils.get(1));
+		}
+		else{
+			//TODO gérer les fonctions
+			String labelFunc = "function-"+a.tok.Value;
+		}
+	}
+	
 	protected void addLoop(Arbre a){
 		//On traite la première action si c'est un for
 		if (a.tok.Classe == TokenClass.TOK_FOR){
@@ -328,10 +338,14 @@ public class CodeGenerator {
 		switch (a.tok.Classe){
 			//Gestion du code
 			case TOK_RAC: 	//Racine du fichier
-				genCode(a.fils.get(0));
+//				genCode(a.fils.get(0));
+				for(Arbre tmp : a.fils){
+					genCode(tmp);
+				}
 				break;
 			case TOK_FUNC: //Fonctions //TODO gérer les fonctions
-				genCode(a.fils.get(1));
+				addFunc(a);
+//				genCode(a.fils.get(1));
 				break;
 			case TOK_SUIT:	//Séquence
 				//TODO ajouter var rang n
@@ -432,7 +446,7 @@ public class CodeGenerator {
 		//On génère le code
 		CodeGenerator code = new CodeGenerator(tst, anal.getSymb());
 		code.constructCode();
-		System.out.println(code.getCode());
+		//System.out.println(code.getCode());
 		
 		//On écrit le code dans un fichier
 		new Writer(fic.getNameFile()+"-compiled.txt", code.getCode());
