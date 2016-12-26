@@ -1,3 +1,36 @@
 .start
-push.i j
+push.i a
+push.i b
+push.i 3
+set ident a
+.loop0
+get ident a
+push.i 3
+cmpeq.i
+jumpf endLoop0
+push.i 4
+set ident a
+push.i i
+push.i 5
+set ident i
+drop
+jump loop0
+.endLoop0
+.loop1
+get ident a
+push.i 3
+cmpeq.i
+jumpf endLoop1
+push.i 4
+set ident a
+push.i i
+push.i 5
+set ident i
+drop
+jump loop1
+.endLoop1
+push.i 1
+set ident b
+drop
+drop
 .halt

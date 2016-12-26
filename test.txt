@@ -2,7 +2,12 @@ function main(){
 	var a;
 	var b;
 	a = 3;
-	if(a == 3){
+	while(a == 3){
+		a = 4;
+		var i;
+		i = 5;
+	}
+	while(a == 3){
 		a = 4;
 		var i;
 		i = 5;
