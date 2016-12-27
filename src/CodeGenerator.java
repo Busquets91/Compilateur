@@ -1,4 +1,10 @@
+import java.beans.Expression;
 import java.util.ArrayList;
+
+/**
+ * @deprecated
+ */
+import javax.script.ScriptEngineManager;
 
 /**
  * 
@@ -54,7 +60,7 @@ public class CodeGenerator {
 	 * @desc Génère le label de fin du programme
 	 */
 	protected void setEnd(){
-		addLabel("halt");
+		addLineCode("halt");
 	}
 	
 	/**
@@ -67,6 +73,64 @@ public class CodeGenerator {
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * @deprecated
+	 * @desc Check si le denom est égal à 0
+	 * @param a [Arbre]
+	 * @return [boolean]
+	 * @throws Exception => denominateur égal à 0
+	 */
+	protected boolean isDenomZero(Arbre a) throws Exception{
+		if (buildOperand(a) == 0){
+			System.err.println("ERREUR DIVISION par zero");
+			throw new Exception();
+		}
+		return false;
+	}
+	
+	/**
+	 * @deprecated
+	 * @desc Calcule la valeur d'un expression
+	 * @param a
+	 * @return
+	 * @throws Exception
+	 */
+	private int buildOperand(Arbre a) throws Exception{
+		int res = 0;
+		if (isInt(a)){
+			res = Integer.parseInt(a.tok.Value);
+		}
+		else{
+			int f0 = buildOperand(a.fils.get(0));
+			int f1 = buildOperand(a.fils.get(1));
+			switch (a.tok.Classe){
+				case TOK_ADD:
+					res = f0 + f1;
+					break;
+				case TOK_LESS:
+					res = f0 - f1;
+					break;
+				case TOK_MULT:
+					res = f0 * f1;
+					break;
+				case TOK_AND:
+					res = f0 & f1;
+					break;
+				case TOK_OR:
+					res = f0 | f1;
+					break;
+				case TOK_DIV:
+					if (!isDenomZero(a.fils.get(1))){
+						res = f0 / f1;
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		return res;
 	}
 	
 	/**
@@ -227,15 +291,28 @@ public class CodeGenerator {
 		//On lance la partie à droite de l'affectation
 		genCode(a.fils.get(1));
 		set(a.fils.get(0));
-		
 	}
 	
 	/**
 	 * @desc Ecrit le code pour les opérandes : +, -, *, /, &&, ||
 	 * @param op [String] Opérateur : add, sub, mul, div, and, or
 	 * @param a [Arbre]
+	 * @version 2
 	 */
 	protected void addOperand(String op, Arbre a){
+		genCode(a.fils.get(0));
+		genCode(a.fils.get(1));
+		addLineCode(op+".i");
+	}
+	
+	/**
+	 * @deprecated
+	 * @version 1 Non valable pour le cas du sub
+	 * @desc Ecrit le code pour les opérandes : +, -, *, /, &&, ||
+	 * @param op [String] Opérateur : add, sub, mul, div, and, or
+	 * @param a [Arbre]
+	 */
+	protected void addOperandOld(String op, Arbre a){
 		if (isInt(a.fils.get(0)) && isInt(a.fils.get(1))){
 			pushElement(a.fils.get(0));
 			pushElement(a.fils.get(1));
@@ -281,29 +358,16 @@ public class CodeGenerator {
 	 */
 	protected void addDiv(Arbre a){
 		//TODO verif div par zero + exception
-		String op = "div";
-		if (isInt(a.fils.get(0)) && isInt(a.fils.get(1))){
-			//Num
-			pushElement(a.fils.get(0));
-			//Denum
-			pushElement(a.fils.get(1));
-			addLineCode(op+".i");
-		}
-		else{
-			if (!isInt(a.fils.get(0)) && !isInt(a.fils.get(1))){
-				genCode(a.fils.get(0));
+		genCode(a.fils.get(0));
+		try {
+//			if (!isDenomZero(a.fils.get(1))){
 				genCode(a.fils.get(1));
-			}
-			else if (!isInt(a.fils.get(0))){
-				genCode(a.fils.get(0));
-				pushElement(a.fils.get(1));
-			}
-			else if (!isInt(a.fils.get(1))){
-				genCode(a.fils.get(1));
-				pushElement(a.fils.get(0));
-			}
-			addLineCode(op+".i");
+//			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		
+		addLineCode("div"+".i");
 	}
 	
 	/**
@@ -345,12 +409,18 @@ public class CodeGenerator {
 	 * @param a [Arbre]s
 	 */
 	protected void addFunc(Arbre a){
+		//TODO gérer le fils 0 "var" dans les fonctions
 		if (a.tok.Value.equals("main")){
+			setStart();
 			genCode(a.fils.get(1));
+			setEnd();
 		}
 		else{
 			//TODO gérer les fonctions
 			String labelFunc = "function-"+a.tok.Value;
+			addLabel(labelFunc);
+			genCode(a.fils.get(1));
+			addLineCode("ret");
 		}
 	}
 	
@@ -391,7 +461,7 @@ public class CodeGenerator {
 	 * @desc Fonction récursive pour génèrer le code
 	 * @param a [Arbre]
 	 */
-	protected void genCode(Arbre a){
+	public void genCode(Arbre a){
 		switch (a.tok.Classe){
 			//Gestion du code
 			case TOK_RAC: 	//Racine du fichier
@@ -467,6 +537,7 @@ public class CodeGenerator {
 				addAff(a);
 				break;
 			case TOK_IDENT:
+				addNumber(a);
 				break;
 			case TOK_INT:
 				addNumber(a);
@@ -474,15 +545,6 @@ public class CodeGenerator {
 			default:
 				break;
 		}
-	}
-
-	/**
-	 * @desc Construit le code
-	 */
-	public void constructCode(){
-		setStart();
-		genCode(arbre);
-		setEnd();
 	}
 	
 	/**
@@ -492,6 +554,14 @@ public class CodeGenerator {
 	public String getCode(){
 		return code;
 	}
+	
+	/**
+	 * @desc Renvoie l'arbre
+	 * @return arbre [Arbre]
+	 */
+	public Arbre getArbre(){
+		return arbre;
+	}
 
 	public static void main(String[] args) throws Exception {
 		//On lit le fichier contenant le code
@@ -499,18 +569,17 @@ public class CodeGenerator {
 		
 		//On l'analyse
 		Analyseur anal = new Analyseur(fic.getString());
-		
 		Arbre tst = anal.getArbre();
+		
 		System.out.println(tst.print());
 		
 		//On génère le code
 		CodeGenerator code = new CodeGenerator(tst, anal.getSymb());
-		code.constructCode();
+		code.genCode(code.getArbre());
 		//System.out.println(code.getCode());
-		
+	
 		//On écrit le code dans un fichier
 		new Writer(fic.getNameFile()+"-compiled.txt", code.getCode());
-		
 	}
 
 }

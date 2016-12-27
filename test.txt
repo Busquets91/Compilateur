@@ -1,16 +1,6 @@
 function main(){
 	var a;
-	var b;
-	a = 3;
-	while(a == 3){
-		a = 4;
-		var i;
-		i = 5;
+	while(a){
+		a = 2;
 	}
-	while(a == 3){
-		a = 4;
-		var i;
-		i = 5;
-	}
-	b = 1;
 }
