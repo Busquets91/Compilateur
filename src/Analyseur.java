@@ -7,8 +7,9 @@ public class Analyseur {
 	private String string;
 	private int index;
 	private int pos;
-	private String[] keyWords = {"if", "for", "while", "var", "int", "else", "function"};
-	private TokenClass[] keyClasse = {TokenClass.TOK_IF, TokenClass.TOK_FOR, TokenClass.TOK_WHILE, TokenClass.TOK_VAR, TokenClass.TOK_INT, TokenClass.TOK_ELSE, TokenClass.TOK_FUNC};
+	private ArrayList<String> functions;
+	private String[] keyWords = {"if", "for", "while", "var", "int", "else", "function", "return"};
+	private TokenClass[] keyClasse = {TokenClass.TOK_IF, TokenClass.TOK_FOR, TokenClass.TOK_WHILE, TokenClass.TOK_VAR, TokenClass.TOK_INT, TokenClass.TOK_ELSE, TokenClass.TOK_FUNC, TokenClass.TOK_RET};
 	private String[] operator = {"&&", "||", "+", "-", "*", "/", "%", "(", ")", "==", "!=", ">=", "<=", ">", "<", "=", "{", "}", ";", "!"};
 	private TokenClass[] keyOperator = {TokenClass.TOK_AND, TokenClass.TOK_OR, TokenClass.TOK_ADD, TokenClass.TOK_LESS,TokenClass.TOK_MULT, TokenClass.TOK_DIV, TokenClass.TOK_MOD, TokenClass.TOK_PO, TokenClass.TOK_PF, TokenClass.TOK_EQA, TokenClass.TOK_DIFF, TokenClass.TOK_SUPE, TokenClass.TOK_INFE, TokenClass.TOK_SUP, TokenClass.TOK_INF, TokenClass.TOK_AFF, TokenClass.TOK_AO, TokenClass.TOK_AF, TokenClass.TOK_PV, TokenClass.TOK_NOT};
 	
@@ -17,6 +18,7 @@ public class Analyseur {
 		this.pos = 0;
 		this.symb = new TableSymbole();
 		this.index = -1;
+		this.functions = new ArrayList<String>();
 	}
 	
 	public TableSymbole getSymb(){
@@ -122,10 +124,32 @@ public class Analyseur {
 			return new Arbre(next());
 		}
 		if(look().Classe == TokenClass.TOK_IDENT){
-			if (symb.search(look().Value) != null){
-				Token variable = next();
-				variable.Value = Integer.toString(symb.search(variable.Value).getIndex());
-				return new Arbre(variable);
+			//APPEL FONCTION
+			Token name = next();
+			Arbre appel = new Arbre(new Token(TokenClass.TOK_APP, name.Value));
+			if (look().Classe == TokenClass.TOK_PO){
+				next();
+				Arbre vars = new Arbre(new Token(TokenClass.TOK_VAR, "var"));
+				int i = 0;
+				while(look().Classe != TokenClass.TOK_PF){
+					Token ident = next();
+					if (ident.Classe == TokenClass.TOK_IDENT || ident.Classe == TokenClass.TOK_INT){
+						ident.Value = Integer.toString(symb.search(ident.Value).getIndex());
+						vars.fils.add(new Arbre(ident));
+						i++;
+					}
+				}
+				if(!functions.contains(name.Value + "|" + i)){
+					System.err.println(name.Value + " PAS DECALRE OU NOMBRE D'ARGUMENT: " + i + " INCORRECT");
+				}
+				if(next().Classe == TokenClass.TOK_PF){
+					appel.fils.add(vars);
+					return appel;
+				}
+			}
+			else if (symb.search(name.Value) != null){
+				name.Value = Integer.toString(symb.search(name.Value).getIndex());
+				return new Arbre(name);
 			}
 			else{
 				System.err.println("VARIABLE " + look().Value + " NON DECLARE");
@@ -257,13 +281,11 @@ public class Analyseur {
 					}
 				}
 				else{
-					System.err.println("ERREUR DANS AFFECTATION");
-					throw new Exception();					
+					return new Arbre(new Token());					
 				}
 			}
 			else{
-				System.err.println("VARIABLE " + look().Value + " NON DECLARE");
-				throw new Exception();
+				return new Arbre(new Token());	
 			}
 		}
 		return new Arbre(new Token());		
@@ -275,15 +297,19 @@ public class Analyseur {
 		do{
 			func = new Arbre(new Token());
 			if(next().Classe == TokenClass.TOK_FUNC && look().Classe == TokenClass.TOK_IDENT){
-				func = new Arbre(new Token(TokenClass.TOK_FUNC, next().Value));
+				String name = next().Value;
+				func = new Arbre(new Token(TokenClass.TOK_FUNC, name));
 				if (next().Classe == TokenClass.TOK_PO){
 					Arbre vars = new Arbre(new Token(TokenClass.TOK_VAR, "var"));
+					int i = 0;
 					while(look().Classe != TokenClass.TOK_PF){
 						Token ident = next();
 						if (ident.Classe == TokenClass.TOK_IDENT){
 							vars.fils.add(new Arbre(ident));
+							i++;
 						}
 					}
+					functions.add(name + "|" + i);
 					next();
 					if (next().Classe == TokenClass.TOK_AO){
 						int mem = index;
@@ -499,6 +525,21 @@ public class Analyseur {
 								else{
 									System.err.println("PARENTHESE OUVRANTE MANQUANTE DANS WHILE");
 									throw new Exception();				
+								}
+							}
+							else{
+								//RETURN
+								if(look().Classe == TokenClass.TOK_RET){
+									instr = new Arbre(next());
+									Arbre exp = expression();
+									if(exp.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_PV){
+										instr.fils.add(exp);						
+										seq.fils.add(instr);
+									}
+									else{
+										System.err.println("ERREUR DANS LE RETURN");
+										throw new Exception();				
+									}
 								}
 							}
 						}
