@@ -5,11 +5,12 @@ public class Analyseur {
 	
 	private TableSymbole symb;
 	private String string;
+	private int index;
 	private int pos;
 	private String[] keyWords = {"if", "for", "while", "var", "int", "else", "function"};
 	private TokenClass[] keyClasse = {TokenClass.TOK_IF, TokenClass.TOK_FOR, TokenClass.TOK_WHILE, TokenClass.TOK_VAR, TokenClass.TOK_INT, TokenClass.TOK_ELSE, TokenClass.TOK_FUNC};
-	private String[] operator = {"&&", "||", "+", "-", "*", "/", "%", "(", ")", "==", "!=", ">=", "<=", ">", "<", "=", "{", "}", ";"};
-	private TokenClass[] keyOperator = {TokenClass.TOK_AND, TokenClass.TOK_OR, TokenClass.TOK_ADD, TokenClass.TOK_LESS,TokenClass.TOK_MULT, TokenClass.TOK_DIV, TokenClass.TOK_MOD, TokenClass.TOK_PO, TokenClass.TOK_PF, TokenClass.TOK_EQA, TokenClass.TOK_DIFF, TokenClass.TOK_SUPE, TokenClass.TOK_INFE, TokenClass.TOK_SUP, TokenClass.TOK_INF, TokenClass.TOK_AFF, TokenClass.TOK_AO, TokenClass.TOK_AF, TokenClass.TOK_PV};
+	private String[] operator = {"&&", "||", "+", "-", "*", "/", "%", "(", ")", "==", "!=", ">=", "<=", ">", "<", "=", "{", "}", ";", "!"};
+	private TokenClass[] keyOperator = {TokenClass.TOK_AND, TokenClass.TOK_OR, TokenClass.TOK_ADD, TokenClass.TOK_LESS,TokenClass.TOK_MULT, TokenClass.TOK_DIV, TokenClass.TOK_MOD, TokenClass.TOK_PO, TokenClass.TOK_PF, TokenClass.TOK_EQA, TokenClass.TOK_DIFF, TokenClass.TOK_SUPE, TokenClass.TOK_INFE, TokenClass.TOK_SUP, TokenClass.TOK_INF, TokenClass.TOK_AFF, TokenClass.TOK_AO, TokenClass.TOK_AF, TokenClass.TOK_PV, TokenClass.TOK_NOT};
 	
 	public Analyseur(String str){
 		this.string = str;
@@ -104,17 +105,17 @@ public class Analyseur {
 	
 	private Arbre primitive() throws Exception{
 		if(look().Classe == TokenClass.TOK_LESS){
-			pos ++;
+			Arbre a = new Arbre(next());
 			Arbre neg = primitive();
 			if (neg.tok.Classe != TokenClass.TOK_NULL){
 				Token tmp = new Token();
-				tmp.Classe = TokenClass.TOK_LESS;
-				tmp.Value = "-";
-				Arbre a = new Arbre(tmp);
+				tmp.Classe = TokenClass.TOK_IDENT;
+				tmp.Value = "0";
+				a.fils.add(new Arbre(tmp));
 				a.fils.add(neg);
 				return a;
 			}
-			return new Arbre(next());
+			return a;
 		}
 		if(look().Classe == TokenClass.TOK_INT){
 			return new Arbre(next());
@@ -203,6 +204,18 @@ public class Analyseur {
 	}
 	
 	private Arbre logical() throws Exception{
+		if(look().Classe == TokenClass.TOK_NOT){
+			Arbre not = new Arbre(next());
+			Arbre log = logical();
+			if(log.tok.Classe != TokenClass.TOK_NULL){
+				not.fils.add(log);
+				return not;
+			}
+			else{
+				System.err.println("ERREUR DANS LOGICAL AVEC LE '!'");
+				throw new Exception();
+			}
+		}
 		Arbre p = comparative();
 		if(p.tok.Classe == TokenClass.TOK_NULL){
 			return new Arbre(new Token());
@@ -237,10 +250,11 @@ public class Analyseur {
 						affect.fils.add(exp);
 						return affect;
 					}
-					System.err.println("ERREUR DANS AFFECTATION");
-					throw new Exception();
 				}
-				return ident;
+				else{
+					System.err.println("ERREUR DANS AFFECTATION");
+					throw new Exception();					
+				}
 			}
 			else{
 				System.err.println("VARIABLE " + look().Value + " NON DECLARE");
@@ -347,7 +361,7 @@ public class Analyseur {
 										instr.fils.add(exp);
 										instr.fils.add(instrIf);
 										symb.pop();
-										if(next().Classe == TokenClass.TOK_ELSE && next().Classe == TokenClass.TOK_AO){
+										if(look().Classe == TokenClass.TOK_ELSE && next().Classe == TokenClass.TOK_ELSE && next().Classe == TokenClass.TOK_AO){
 											symb.push();
 											Arbre instrElse = instruction();
 											if(instrElse.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_AF){

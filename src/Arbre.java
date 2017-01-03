@@ -5,11 +5,9 @@ public class Arbre {
 	
 	public Token tok;
 	public ArrayList<Arbre> fils;
-	public Arbre next;
 	
 	public Arbre(Token t){
 		tok = t;
-		next = null;
 		fils = new ArrayList<Arbre>();
 	}
 	

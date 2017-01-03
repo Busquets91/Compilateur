@@ -34,5 +34,6 @@ public enum TokenClass {
 	TOK_AND,
 	TOK_OR,
 	TOK_FUNC,
-	TOK_RAC
+	TOK_RAC,
+	TOK_NOT
 }

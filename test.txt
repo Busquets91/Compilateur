@@ -1,6 +1,7 @@
 function main(){
 	var a;
-	while(a){
-		a = 2;
-	}
+}
+
+function maindd(var b, var c){
+	var e;
 }
