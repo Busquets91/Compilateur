@@ -8,6 +8,14 @@ jumpf endIf0
 push.i 2
 set ident a
 .endIf0
+get ident a
+push.i 1
+cmpeq.i
+jumpf endIf1
+.if1
+push.i 2
+set ident a
+.endIf1
 drop
 halt
 .function-maindd
