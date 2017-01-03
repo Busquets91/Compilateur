@@ -158,7 +158,9 @@ public class Analyseur {
 				while(look().Classe != TokenClass.TOK_PF){
 					Token ident = next();
 					if (ident.Classe == TokenClass.TOK_IDENT || ident.Classe == TokenClass.TOK_INT){
-						ident.Value = Integer.toString(symb.search(ident.Value).getIndex());
+						if(ident.Classe == TokenClass.TOK_IDENT){
+							ident.Value = Integer.toString(symb.search(ident.Value).getIndex());
+						}
 						vars.fils.add(new Arbre(ident));
 						i++;
 					}
@@ -381,20 +383,27 @@ public class Analyseur {
 				String name = next().Value;
 				func = new Arbre(new Token(TokenClass.TOK_FUNC, name));
 				if (next().Classe == TokenClass.TOK_PO){
+					int mem = index;
+					symb.push();
 					Arbre vars = new Arbre(new Token(TokenClass.TOK_VAR, "var"));
 					int i = 0;
-					while(look().Classe != TokenClass.TOK_PF){
+					while(look().Classe == TokenClass.TOK_VAR){
+						next();
 						Token ident = next();
-						if (ident.Classe == TokenClass.TOK_IDENT){
+						if (ident.Classe == TokenClass.TOK_IDENT && symb.searchSameLevel(ident.Value) == null){
+							index += 1;
+							symb.define(ident.Value, index);
+							ident.Value = Integer.toString(index);
 							vars.fils.add(new Arbre(ident));
 							i++;
 						}
 					}
 					functions.add(name + "|" + i);
-					next();
+					if(next().Classe != TokenClass.TOK_PF){
+						System.err.println("ERREUR DANS DECLARATION FONCTION");
+						throw new Exception();
+					}
 					if (next().Classe == TokenClass.TOK_AO){
-						int mem = index;
-						symb.push();
 						Arbre content = instruction();
 						if (content.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_AF){
 							func.fils.add(vars);
