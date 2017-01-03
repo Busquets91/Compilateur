@@ -1,13 +1,6 @@
 function main(){
 	var a;
-	if(a==1){
-		a=2;
+	for(a=0;a<2;a=a+1){
+		a = 2;
 	}
-	if(a==1){
-		a=2;
-	}
-}
-
-function maindd(var b, var c){
-	var e;
 }

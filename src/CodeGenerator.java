@@ -29,8 +29,8 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère une ligne de code à partir d'un string
-	 * @param str [String] code à générer
+	 * @desc GÃ©nÃ¨re une ligne de code Ã  partir d'un string
+	 * @param str [String] code Ã  gÃ©nÃ©rer
 	 */
 	protected void addLineCode(String str){
 		code += str+"\n";
@@ -45,14 +45,14 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le label de début de programme
+	 * @desc GÃ©nÃ¨re le label de dÃ©but de programme
 	 */
 	protected void setStart(){
 		addLabel("start");
 	}
 	
 	/**
-	 * @desc Génère le label de fin du programme
+	 * @desc GÃ©nÃ¨re le label de fin du programme
 	 */
 	protected void setEnd(){
 		addLineCode("halt");
@@ -72,10 +72,10 @@ public class CodeGenerator {
 	
 	/**
 	 * @deprecated
-	 * @desc Check si le denom est égal à 0
+	 * @desc Check si le denom est Ã©gal Ã  0
 	 * @param a [Arbre]
 	 * @return [boolean]
-	 * @throws Exception => denominateur égal à 0
+	 * @throws Exception => denominateur Ã©gal Ã  0
 	 */
 	protected boolean isDenomZero(Arbre a) throws Exception{
 		if (buildOperand(a) == 0){
@@ -129,7 +129,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc	Génère du code : push la valeur de la variable
+	 * @desc	GÃ©nÃ¨re du code : push la valeur de la variable
 	 * @param 	a [Arbre] de type int ou ident
 	 */
 	protected void push(Arbre a){
@@ -137,7 +137,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc	Génère du code : - push pour un int
+	 * @desc	GÃ©nÃ¨re du code : - push pour un int
 	 * 							 - get pour un ident
 	 * @param 	a [Arbre] de type int ou ident
 	 */
@@ -155,26 +155,26 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc	Génère du code : get la valeur de la variable à l'indice précisé
+	 * @desc	GÃ©nÃ¨re du code : get la valeur de la variable Ã  l'indice prÃ©cisÃ©
 	 * @param 	a [Arbre] de type ident
 	 */
 	protected void get(Arbre a){
-		//TODO récupérer l'ident de la variable
+		//TODO rÃ©cupÃ©rer l'ident de la variable
 		addLineCode("get "+"ident "+a.tok.Value);
 	}
 	
 	/**
-	 * @desc	Génère du code : set la valeur de la variable à l'indice précisé
+	 * @desc	GÃ©nÃ¨re du code : set la valeur de la variable Ã  l'indice prÃ©cisÃ©
 	 * @param 	a [Arbre] de type ident
 	 */
 	protected void set(Arbre a){
-		//TODO récupérer l'ident de la variable
+		//TODO rÃ©cupÃ©rer l'ident de la variable
 		addLineCode("set "+"ident "+a.tok.Value);
 	}
 	
 	/**
-	 * @desc Ajoute autant de drop qu'il y a de variable à supprimer de la pile
-	 * @param n [int] le nombre de variable à supprimer de la pile
+	 * @desc Ajoute autant de drop qu'il y a de variable Ã  supprimer de la pile
+	 * @param n [int] le nombre de variable Ã  supprimer de la pile
 	 */
 	protected void drop(int n){
 		for (int i = 0; i < n; i++){
@@ -183,7 +183,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Renvoie le code en fonction de la comparaison à effectuer
+	 * @desc Renvoie le code en fonction de la comparaison Ã  effectuer
 	 * @param a [Arbre]
 	 * @return str [String] code en focntion de la comparaison
 	 */
@@ -215,11 +215,11 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le code pour un if
+	 * @desc GÃ©nÃ¨re le code pour un if
 	 * @param ifTree
 	 */
 	protected void addIf(Arbre ifTree){
-		//On crée le label
+		//On crÃ©e le label
 		String labelIf = "if"+nbIf;
 		String labelElse = "else"+nbIf;
 		String labelEnd = "endIf"+nbIf;
@@ -246,7 +246,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le code pour ajotuer une variable à la pile
+	 * @desc GÃ©nÃ¨re le code pour ajotuer une variable Ã  la pile
 	 * @param a [Arbre]
 	 */
 	protected void addVar(Arbre a){
@@ -268,7 +268,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Incrémente le compteur de variable à l'indice du bloc courant
+	 * @desc IncrÃ©mente le compteur de variable Ã  l'indice du bloc courant
 	 */
 	protected void incrementCompteur(){
 		int index = getLastIndex();
@@ -278,19 +278,19 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le code pour une affectation
+	 * @desc GÃ©nÃ¨re le code pour une affectation
 	 * @example a = 3;
 	 * @param a [Arbre]
 	 */
 	protected void addAff(Arbre a){
-		//On lance la partie à droite de l'affectation
+		//On lance la partie Ã  droite de l'affectation
 		genCode(a.fils.get(1));
 		set(a.fils.get(0));
 	}
 	
 	/**
-	 * @desc Ecrit le code pour les opérandes : +, -, *, /, &&, ||
-	 * @param op [String] Opérateur : add, sub, mul, div, and, or
+	 * @desc Ecrit le code pour les opÃ©randes : +, -, *, /, &&, ||
+	 * @param op [String] OpÃ©rateur : add, sub, mul, div, and, or
 	 * @param a [Arbre]
 	 * @version 2
 	 */
@@ -303,8 +303,8 @@ public class CodeGenerator {
 	/**
 	 * @deprecated
 	 * @version 1 Non valable pour le cas du sub
-	 * @desc Ecrit le code pour les opérandes : +, -, *, /, &&, ||
-	 * @param op [String] Opérateur : add, sub, mul, div, and, or
+	 * @desc Ecrit le code pour les opÃ©randes : +, -, *, /, &&, ||
+	 * @param op [String] OpÃ©rateur : add, sub, mul, div, and, or
 	 * @param a [Arbre]
 	 */
 	protected void addOperandOld(String op, Arbre a){
@@ -332,7 +332,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le code d'un +
+	 * @desc GÃ©nÃ¨re le code d'un +
 	 * @param a [Arbre]
 	 */
 	protected void addAdd(Arbre a){
@@ -340,7 +340,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le code d'un -
+	 * @desc GÃ©nÃ¨re le code d'un -
 	 * @param a [Arbre]
 	 */
 	protected void addSub(Arbre a){
@@ -348,7 +348,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le code d'un /
+	 * @desc GÃ©nÃ¨re le code d'un /
 	 * @param a [Arbre]
 	 */
 	protected void addDiv(Arbre a){
@@ -366,7 +366,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le code d'un *
+	 * @desc GÃ©nÃ¨re le code d'un *
 	 * @param a [Arbre]
 	 */
 	protected void addMult(Arbre a){
@@ -374,7 +374,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le code d'un and
+	 * @desc GÃ©nÃ¨re le code d'un and
 	 * @param a [Arbre]
 	 */
 	protected void addAnd(Arbre a){
@@ -382,7 +382,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le code d'un or
+	 * @desc GÃ©nÃ¨re le code d'un or
 	 * @param a [Arbre]
 	 */
 	protected void addOr(Arbre a){
@@ -390,7 +390,16 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le code pour une comparaison
+	 * @desc Génère le code d'un not
+	 * @param a [Arbre]
+	 */
+	protected void addNot(Arbre a){
+		genCode(a.fils.get(0));
+		addLineCode("not");
+	}
+	
+	/**
+	 * @desc GÃ©nÃ¨re le code pour une comparaison
 	 * @param a [Arbre]
 	 */
 	protected void addComp(Arbre a){
@@ -404,14 +413,14 @@ public class CodeGenerator {
 	 * @param a [Arbre]s
 	 */
 	protected void addFunc(Arbre a){
-		//TODO gérer le fils 0 "var" dans les fonctions
+		//TODO gÃ©rer le fils 0 "var" dans les fonctions
 		if (a.tok.Value.equals("main")){
 			setStart();
 			genCode(a.fils.get(1));
 			setEnd();
 		}
 		else{
-			//TODO gérer les fonctions
+			//TODO gÃ©rer les fonctions
 			String labelFunc = "function-"+a.tok.Value;
 			addLabel(labelFunc);
 			genCode(a.fils.get(1));
@@ -420,11 +429,11 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le code d'un loop
+	 * @desc GÃ©nÃ¨re le code d'un loop
 	 * @param a [Arbre]
 	 */
 	protected void addLoop(Arbre a){
-		//On traite la première action si c'est un for
+		//On traite la premiÃ¨re action si c'est un for
 		if (a.tok.Classe == TokenClass.TOK_FOR){
 			addAff(a.fils.get(0));
 		}
@@ -445,7 +454,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Génère le code pour ajouter une constante
+	 * @desc GÃ©nÃ¨re le code pour ajouter une constante
 	 * @param a [Arbre]
 	 */
 	protected void addNumber(Arbre a){
@@ -453,7 +462,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Fonction récursive pour génèrer le code
+	 * @desc Fonction rÃ©cursive pour gÃ©nÃ¨rer le code
 	 * @param a [Arbre]
 	 */
 	public void genCode(Arbre a){
@@ -464,15 +473,15 @@ public class CodeGenerator {
 					genCode(tmp);
 				}
 				break;
-			case TOK_FUNC: //Fonctions //TODO gérer les fonctions
+			case TOK_FUNC: //Fonctions //TODO gÃ©rer les fonctions
 				addFunc(a);
 				break;
-			case TOK_SUIT:	//Séquence
+			case TOK_SUIT:	//SÃ©quence
 				tableCpt.add(0);
 				for(Arbre tmp : a.fils){
 					genCode(tmp);
 				}
-				//TODO savoir le nombre de variable à supprimer
+				//TODO savoir le nombre de variable Ã  supprimer
 				drop(tableCpt.get(getLastIndex()));
 				tableCpt.remove(getLastIndex());
 				break;
@@ -494,6 +503,9 @@ public class CodeGenerator {
 				break;
 			case TOK_OR:	// ||
 				addOr(a);
+				break;
+			case TOK_NOT:
+				addNot(a);
 				break;
 			//Operand comparaison
 			case TOK_EQA: 	// ==
@@ -543,7 +555,7 @@ public class CodeGenerator {
 	}
 	
 	/**
-	 * @desc Renvoie le code généré
+	 * @desc Renvoie le code gÃ©nÃ©rÃ©
 	 * @return code [String]
 	 */
 	public String getCode(){
@@ -568,12 +580,12 @@ public class CodeGenerator {
 		
 		System.out.println(tst.print());
 		
-		//On génère le code
+		//On gÃ©nÃ¨re le code
 		CodeGenerator code = new CodeGenerator(tst, anal.getSymb());
 		code.genCode(code.getArbre());
 		//System.out.println(code.getCode());
 	
-		//On écrit le code dans un fichier
+		//On Ã©crit le code dans un fichier
 		new Writer(fic.getNameFile()+"-compiled.txt", code.getCode());
 	}
 
