@@ -133,7 +133,16 @@ public class CodeGenerator {
 	 * @param 	a [Arbre] de type int ou ident
 	 */
 	protected void push(Arbre a){
-		addLineCode("push.i "+a.tok.Value);
+		switch (a.tok.Classe){
+			case TOK_INT:
+				addLineCode("push.i "+a.tok.Value);
+				break;
+			case TOK_IDENT:
+				addLineCode("push.i 0");
+				break;
+			default:
+				break;
+		}
 	}
 	
 	/**
@@ -160,7 +169,7 @@ public class CodeGenerator {
 	 */
 	protected void get(Arbre a){
 		//TODO rÃ©cupÃ©rer l'ident de la variable
-		addLineCode("get "+"ident "+a.tok.Value);
+		addLineCode("get "+a.tok.Value);
 	}
 	
 	/**
@@ -169,7 +178,7 @@ public class CodeGenerator {
 	 */
 	protected void set(Arbre a){
 		//TODO rÃ©cupÃ©rer l'ident de la variable
-		addLineCode("set "+"ident "+a.tok.Value);
+		addLineCode("set "+a.tok.Value);
 	}
 	
 	/**
@@ -423,6 +432,9 @@ public class CodeGenerator {
 			//TODO gÃ©rer les fonctions
 			String labelFunc = "function-"+a.tok.Value;
 			addLabel(labelFunc);
+			for(Arbre tmp : a.fils.get(0).fils){
+				//TODO gérer variable
+			}
 			genCode(a.fils.get(1));
 			addLineCode("ret");
 		}

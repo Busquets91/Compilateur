@@ -1,19 +1,8 @@
 .start
-push.i a
 push.i 0
-set ident a
-.loop0
-get ident a
-push.i 2
-cmplt.i
-jumpf endLoop0
-push.i 2
-set ident a
-get ident a
-push.i 1
+get i
+push.i 10
 add.i
-set ident a
-jump loop0
-.endLoop0
+set i
 drop
 halt

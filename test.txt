@@ -1,6 +1,4 @@
 function main(){
-	var a;
-	for(a=0;a<2;a=a+1){
-		a = 2;
-	}
+	var i;
+	i = i + 10;
 }
