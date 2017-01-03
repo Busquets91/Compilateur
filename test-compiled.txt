@@ -1,11 +1,16 @@
 .start
 push.i a
-.loop0
 get ident a
-jumpf endLoop0
+push.i 1
+cmpeq.i
+jumpf endIf0
+.if0
 push.i 2
 set ident a
-jump loop0
-.endLoop0
+.endIf0
 drop
 halt
+.function-maindd
+push.i e
+drop
+ret
