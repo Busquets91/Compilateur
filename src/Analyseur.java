@@ -16,7 +16,7 @@ public class Analyseur {
 		this.string = str;
 		this.pos = 0;
 		this.symb = new TableSymbole();
-		this.index = 0;
+		this.index = -1;
 	}
 	
 	public TableSymbole getSymb(){

@@ -1,8 +1,8 @@
 .start
 push.i 0
-get i
+get 0
 push.i 10
 add.i
-set i
+set 0
 drop
 halt
