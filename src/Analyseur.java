@@ -16,6 +16,7 @@ public class Analyseur {
 		this.string = str;
 		this.pos = 0;
 		this.symb = new TableSymbole();
+		this.index = 0;
 	}
 	
 	public TableSymbole getSymb(){
@@ -281,14 +282,18 @@ public class Analyseur {
 					}
 					next();
 					if (next().Classe == TokenClass.TOK_AO){
+						int mem = index;
+						symb.push();
 						Arbre content = instruction();
 						if (content.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_AF){
 							func.fils.add(vars);
 							func.fils.add(content);
 							funcs.fils.add(func);
+							symb.pop();
+							index = mem;
 						}
 						else{
-							System.err.println("ERREUR DANS CONTENU FONCTION");
+							System.err.println("ERREUR DANS CONTENU FONCTION: " + func.tok.Value);
 							throw new Exception();
 						}
 					}
@@ -330,6 +335,8 @@ public class Analyseur {
 						if (next().Classe == TokenClass.TOK_PV){
 							if (symb.searchSameLevel(instr.fils.get(0).tok.Value) == null){
 								symb.define(instr.fils.get(0).tok.Value);
+								index += 1;
+								instr.fils.get(0).tok.Value = instr.fils.get(0).tok.Value + "|" + Integer.toString(index);
 							}
 							else{
 								System.err.println("VARIABLE " + instr.fils.get(0).tok.Value + " DEJA DECLARE AU MEME NIVEAU");
@@ -355,18 +362,22 @@ public class Analyseur {
 							Arbre exp = expression();
 							if(exp.tok.Classe != TokenClass.TOK_NULL){
 								if(next().Classe == TokenClass.TOK_PF && next().Classe == TokenClass.TOK_AO){
+									int mem = index;
 									symb.push();
 									Arbre instrIf = instruction();
 									if(instrIf.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_AF){
 										instr.fils.add(exp);
 										instr.fils.add(instrIf);
 										symb.pop();
+										index = mem;
 										if(look().Classe == TokenClass.TOK_ELSE && next().Classe == TokenClass.TOK_ELSE && next().Classe == TokenClass.TOK_AO){
+											mem = index;
 											symb.push();
 											Arbre instrElse = instruction();
 											if(instrElse.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_AF){
 												instr.fils.add(instrElse);
 												symb.pop();
+												index = mem;
 											}
 											else{
 												System.err.println("INSTRUCTION MANQUANTE DANS ELSE");
@@ -407,6 +418,7 @@ public class Analyseur {
 										if(exp.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_PV){
 											Arbre instrFor = affectation();
 											if(instrFor.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_PF && next().Classe == TokenClass.TOK_AO){
+												int mem = index;
 												symb.push();
 												Arbre instrBloc = instruction();
 												if(instrBloc.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_AF){
@@ -418,6 +430,7 @@ public class Analyseur {
 													instrIf.fils.add(instrBloc);						
 													seq.fils.add(instr);
 													symb.pop();
+													index = mem;
 												}						
 												else{
 													System.err.println("INSTRUCTION DAND LA BOUCLE FOR INCORRECT OU ACCOLADE MANQUANTE");
@@ -456,6 +469,7 @@ public class Analyseur {
 								if(next().Classe == TokenClass.TOK_PO){
 									Arbre condition = expression();
 									if(condition.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_PF && next().Classe == TokenClass.TOK_AO){
+										int mem = index;
 										symb.push();
 										Arbre instrBloc = instruction();
 										if(instrBloc.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_AF){
@@ -466,6 +480,7 @@ public class Analyseur {
 											instrIf.fils.add(instrBloc);						
 											seq.fils.add(instr);
 											symb.pop();
+											index = mem;
 										}
 										else{
 											System.err.println("INSTRUCTION/ACCOLADE MANQUANTE DANS BOUCLE WHILE");
