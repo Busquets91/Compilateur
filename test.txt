@@ -1,4 +1,8 @@
+function test(){
+	return 2;
+}
 function main(){
 	var i;
-	i = i + 10;
+	i = test();
 }
+

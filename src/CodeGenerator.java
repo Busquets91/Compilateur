@@ -430,14 +430,36 @@ public class CodeGenerator {
 		}
 		else{
 			//TODO gÃ©rer les fonctions
-			String labelFunc = "function-"+a.tok.Value;
+			String labelFunc = a.tok.Value+"F";
 			addLabel(labelFunc);
 			for(Arbre tmp : a.fils.get(0).fils){
 				//TODO gérer variable
 			}
 			genCode(a.fils.get(1));
-			addLineCode("ret");
 		}
+	}
+	
+	/**
+	 * @desc Ajoute un return
+	 * @param a [Arbre]s
+	 */
+	protected void addReturn(Arbre a){
+		genCode(a.fils.get(0));
+		addLineCode("ret");
+	}
+	
+	/**
+	 * @desc Ajoute un appel de fonction
+	 * @param a [Arbre]s
+	 */
+	protected void addAppel(Arbre a){
+		int nbArg = 0;
+		for(Arbre tmp : a.fils.get(0).fils){
+			pushElement(tmp);
+			nbArg++;
+		}
+		addLineCode("prep "+a.tok.Value+"F");
+		addLineCode("call "+nbArg);
 	}
 	
 	/**
@@ -496,6 +518,12 @@ public class CodeGenerator {
 				//TODO savoir le nombre de variable Ã  supprimer
 				drop(tableCpt.get(getLastIndex()));
 				tableCpt.remove(getLastIndex());
+				break;
+			case TOK_RET:
+				addReturn(a);
+				break;
+			case TOK_APP:
+				addAppel(a);
 				break;
 			//Operand
 			case TOK_ADD:	// +
