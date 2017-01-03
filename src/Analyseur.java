@@ -123,7 +123,9 @@ public class Analyseur {
 		}
 		if(look().Classe == TokenClass.TOK_IDENT){
 			if (symb.search(look().Value) != null){
-				return new Arbre(next());
+				Token variable = next();
+				variable.Value = Integer.toString(symb.search(variable.Value).getIndex());
+				return new Arbre(variable);
 			}
 			else{
 				System.err.println("VARIABLE " + look().Value + " NON DECLARE");
@@ -242,7 +244,9 @@ public class Analyseur {
 	private Arbre affectation() throws Exception{
 		if(look().Classe == TokenClass.TOK_IDENT){
 			if (symb.search(look().Value) != null){
-				Arbre ident = new Arbre(next());
+				Token variable = next();
+				variable.Value = Integer.toString(symb.search(variable.Value).getIndex());
+				Arbre ident = new Arbre(variable);
 				if(look().Classe == TokenClass.TOK_AFF){
 					Arbre affect = new Arbre(next());
 					Arbre exp = expression();
@@ -334,9 +338,9 @@ public class Analyseur {
 						instr.fils.add(new Arbre(next()));
 						if (next().Classe == TokenClass.TOK_PV){
 							if (symb.searchSameLevel(instr.fils.get(0).tok.Value) == null){
-								symb.define(instr.fils.get(0).tok.Value);
 								index += 1;
-								instr.fils.get(0).tok.Value = instr.fils.get(0).tok.Value + "|" + Integer.toString(index);
+								symb.define(instr.fils.get(0).tok.Value, index);
+								instr.fils.get(0).tok.Value = Integer.toString(index);
 							}
 							else{
 								System.err.println("VARIABLE " + instr.fils.get(0).tok.Value + " DEJA DECLARE AU MEME NIVEAU");
@@ -515,15 +519,4 @@ public class Analyseur {
 		return tab;
 	}
 	
-	public static void main(String args[]) throws Exception{
-		//FICHIER
-		Reader fic = new Reader("/home/tp-home004/apoint1/workspace/Compilateur.zip_expanded/Compilateur/Analyseur/src/test.txt");
-		Analyseur anal = new Analyseur(fic.getString());
-		
-		//Analyseur anal = new Analyseur("var alexis; alexis = 3;var yo;var vivien; if(yo == alexis - vivien){var vivien; vivien = 0;}else{alexis = 1000;}var i;while(i==0){var vi; vi = 5;}");
-		
-		anal.symb.push();
-		Arbre tst = anal.instruction();
-		System.out.println(tst.print());
-	}
 }
