@@ -29,8 +29,8 @@ public class TableSymbole {
 		return null;
 	}
 	
-	public Symbole define(String ident) throws Exception{
-		Symbole newSymb = new Symbole(ident);
+	public Symbole define(String ident, int index) throws Exception{
+		Symbole newSymb = new Symbole(ident, index);
 		HashMap<Integer, Symbole> currentHm = pile.peek();
 		for (Integer key : currentHm.keySet()){
 			if (Objects.equals(ident , currentHm.get(key).getIdent())){
@@ -80,26 +80,4 @@ public class TableSymbole {
 	public int getRang(){
 		return rang;
 	}
-	
-	public static void main(String[] args) throws Exception {
-		TableSymbole tbl = new TableSymbole();
-		tbl.push();
-		tbl.define("x");
-		tbl.define("y");
-		System.out.println(tbl.search("z"));
-		tbl.push();
-		System.out.println(tbl.search("x"));
-		tbl.define("z");
-		tbl.define("x");
-		tbl.push();
-		tbl.define("a");
-		tbl.print();
-		tbl.pop();
-		tbl.define("b");
-		System.out.println(tbl.search("x"));
-		tbl.pop();
-		tbl.pop();
-		
-	}
-
 }
