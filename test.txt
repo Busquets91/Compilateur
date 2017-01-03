@@ -1,6 +1,13 @@
 function main(){
 	var a;
+<<<<<<< HEAD
 	if(a==1){
 		a=2;
 	}
+=======
+}
+
+function maindd(var b, var c){
+	var e;
+>>>>>>> 3842c71791e0d29fa19f2c9211345dafda4e8541
 }
