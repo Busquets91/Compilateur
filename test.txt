@@ -1,10 +1,19 @@
 function main(){
 	var a;
+<<<<<<< HEAD
 	if(a==1){
 		a=2;
 	}
+=======
+<<<<<<< HEAD
+	if(a==1){
+		a=2;
+	}
+=======
+>>>>>>> 6f581f92a2bf282360e144ebf117b870a135d6c8
 }
 
 function maindd(var b, var c){
 	var e;
+>>>>>>> 3842c71791e0d29fa19f2c9211345dafda4e8541
 }
