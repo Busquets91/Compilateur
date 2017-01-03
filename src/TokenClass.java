@@ -37,5 +37,7 @@ public enum TokenClass {
 	TOK_RAC,
 	TOK_NOT,
 	TOK_RET,
-	TOK_APP
+	TOK_APP,
+	TOK_TRUE,
+	TOK_FALSE
 }

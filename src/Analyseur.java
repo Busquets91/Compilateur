@@ -8,8 +8,8 @@ public class Analyseur {
 	private int index;
 	private int pos;
 	private ArrayList<String> functions;
-	private String[] keyWords = {"if", "for", "while", "var", "int", "else", "function", "return"};
-	private TokenClass[] keyClasse = {TokenClass.TOK_IF, TokenClass.TOK_FOR, TokenClass.TOK_WHILE, TokenClass.TOK_VAR, TokenClass.TOK_INT, TokenClass.TOK_ELSE, TokenClass.TOK_FUNC, TokenClass.TOK_RET};
+	private String[] keyWords = {"if", "for", "while", "var", "int", "else", "function", "return", "true", "false"};
+	private TokenClass[] keyClasse = {TokenClass.TOK_IF, TokenClass.TOK_FOR, TokenClass.TOK_WHILE, TokenClass.TOK_VAR, TokenClass.TOK_INT, TokenClass.TOK_ELSE, TokenClass.TOK_FUNC, TokenClass.TOK_RET, TokenClass.TOK_TRUE, TokenClass.TOK_FALSE};
 	private String[] operator = {"&&", "||", "+", "-", "*", "/", "%", "(", ")", "==", "!=", ">=", "<=", ">", "<", "=", "{", "}", ";", "!"};
 	private TokenClass[] keyOperator = {TokenClass.TOK_AND, TokenClass.TOK_OR, TokenClass.TOK_ADD, TokenClass.TOK_LESS,TokenClass.TOK_MULT, TokenClass.TOK_DIV, TokenClass.TOK_MOD, TokenClass.TOK_PO, TokenClass.TOK_PF, TokenClass.TOK_EQA, TokenClass.TOK_DIFF, TokenClass.TOK_SUPE, TokenClass.TOK_INFE, TokenClass.TOK_SUP, TokenClass.TOK_INF, TokenClass.TOK_AFF, TokenClass.TOK_AO, TokenClass.TOK_AF, TokenClass.TOK_PV, TokenClass.TOK_NOT};
 	
@@ -20,6 +20,10 @@ public class Analyseur {
 		this.index = -1;
 		this.functions = new ArrayList<String>();
 	}
+	
+	/**************************
+	 * Fonctions GET
+	 ***************************/
 	
 	public TableSymbole getSymb(){
 		return symb;
@@ -37,6 +41,10 @@ public class Analyseur {
 		throw new Exception();
 	}
 	
+	
+	/*********************************
+	 * Fonctions de détection de token
+	 *********************************/	
 	private Boolean strIsToken(String tokenClasse){
 		if(string.indexOf(tokenClasse, pos) == pos && !Character.isLetterOrDigit(this.string.charAt(pos+tokenClasse.length()))){
 			pos += tokenClasse.length();
@@ -52,7 +60,10 @@ public class Analyseur {
 		}
 		return false;
 	}
-	
+
+	/*********************************
+	 * Fonctions de parcourt de token
+	 *********************************/	
 	private Token look(){
 		Token tok = new Token();
 		int savePos = pos;
@@ -106,7 +117,19 @@ public class Analyseur {
 		return next();
 	}
 	
+
+	/*********************************
+	 * Vérifie que la chaine de token qui suit est bien une primitive.
+	 * Une primitive peut etre:
+	 * - l'inverse du primitive : (-P)
+	 * - un INT simple (INT)
+	 * - un identifier de type variable(ex: test) (IDENT)
+	 * - un identifier de type appel à une fonction(ex: test(a, b)) (APPEL)
+	 * - une expression entre parathése( (E) )
+	 * - si il ne reconnait rien, on renvoie un arbre vide, provoquera une erreur.
+	 *********************************/		
 	private Arbre primitive() throws Exception{
+		//CAS -P
 		if(look().Classe == TokenClass.TOK_LESS){
 			Arbre a = new Arbre(next());
 			Arbre neg = primitive();
@@ -120,13 +143,14 @@ public class Analyseur {
 			}
 			return a;
 		}
+		//CAS INT
 		if(look().Classe == TokenClass.TOK_INT){
 			return new Arbre(next());
 		}
 		if(look().Classe == TokenClass.TOK_IDENT){
-			//APPEL FONCTION
 			Token name = next();
 			Arbre appel = new Arbre(new Token(TokenClass.TOK_APP, name.Value));
+			//CAS APPEL
 			if (look().Classe == TokenClass.TOK_PO){
 				next();
 				Arbre vars = new Arbre(new Token(TokenClass.TOK_VAR, "var"));
@@ -147,6 +171,7 @@ public class Analyseur {
 					return appel;
 				}
 			}
+			//CAS IDENT
 			else if (symb.search(name.Value) != null){
 				name.Value = Integer.toString(symb.search(name.Value).getIndex());
 				return new Arbre(name);
@@ -156,11 +181,12 @@ public class Analyseur {
 				throw new Exception();
 			}
 		}
+		//CAS (E)
 		if(look().Classe != TokenClass.TOK_PO){
 			return new Arbre(new Token());
 		}
 		pos ++;
-		Arbre res = expression();
+		Arbre res = additive();
 		if (res.tok.Classe != TokenClass.TOK_NULL && look().Classe == TokenClass.TOK_PF){
 			pos ++;
 			return res;
@@ -168,15 +194,25 @@ public class Analyseur {
 		else if(res.tok.Classe != TokenClass.TOK_NULL ){
 			return res;
 		}
+		//SI AUCUN DES CAS, ARBRE NUL, PROVOQUERA UNE ERREUR
 		return new Arbre(new Token());
 	}
 	
+	/*********************************
+	 * Vérifie que la chaine de token qui suit est bien un multiplieur
+	 * Un multiplieur peut etre:
+	 * - une primitive simple: P
+	 * - une multiplication de P et d'un multiplieur: P * M
+	 * - une division de P et d'un multiplieur: P / M
+	 * - si il ne reconnait rien, on renvoie un arbre vide, provoquera une erreur.
+	 *********************************/
 	private Arbre multiplieur() throws Exception{
 		Arbre p = primitive();
 		if(p.tok.Classe == TokenClass.TOK_NULL){
 			return new Arbre(new Token());
 		}
 		if(look().Classe == TokenClass.TOK_MULT || look().Classe == TokenClass.TOK_DIV){
+			//CAS P / M et CAS P * M
 			Arbre a = new Arbre(next());
 			Arbre b = multiplieur();
 			if (b.tok.Classe != TokenClass.TOK_NULL){
@@ -187,15 +223,25 @@ public class Analyseur {
 			System.err.println("ERREUR DANS MULTIPLIEUR");
 			throw new Exception();
 		}
+		// CAS P simple
 		return p;
 	}
 	
+	/*********************************
+	 * Vérifie que la chaine de token qui suit est bien une additive
+	 * Une additive peut etre:
+	 * - un multiplieur simple: M
+	 * - une addition de M et d'une additive: M + A
+	 * - une soustraction de M et d'une additive: M - A
+	 * - si il ne reconnait rien, on renvoie un arbre vide, provoquera une erreur.
+	 *********************************/
 	private Arbre additive() throws Exception{
 		Arbre p = multiplieur();
 		if(p.tok.Classe == TokenClass.TOK_NULL){
 			return new Arbre(new Token());
 		}
 		if(look().Classe == TokenClass.TOK_ADD || look().Classe == TokenClass.TOK_LESS){
+			//CAS M + A et CAS M - A
 			Arbre a = new Arbre(next());
 			Arbre b = additive();
 			if (b.tok.Classe != TokenClass.TOK_NULL){
@@ -206,10 +252,27 @@ public class Analyseur {
 			System.err.println("ERREUR DANS ADDITIVE");
 			throw new Exception();
 		}
+		// CAS M simple
 		return p;
 	}
 	
+	/*********************************
+	 * Vérifie que la chaine de token qui suit est bien une comparative
+	 * Une comparative peut etre:
+	 * - un true ou un false
+	 * - une comparaison de deux additive
+	 * - si il ne reconnait rien, on renvoie un arbre vide, provoquera une erreur.
+	 *********************************/
 	private Arbre comparative() throws Exception{
+		//CAS TRUE ET FALSE
+		if (look().Classe == TokenClass.TOK_TRUE){
+			next();
+			return new Arbre(new Token(TokenClass.TOK_INT, "1"));
+		}
+		if (look().Classe == TokenClass.TOK_FALSE){
+			next();
+			return new Arbre(new Token(TokenClass.TOK_INT, "0"));
+		}
 		Arbre p = additive();
 		if(p.tok.Classe == TokenClass.TOK_NULL){
 			return new Arbre(new Token());
@@ -227,10 +290,20 @@ public class Analyseur {
 			System.err.println("ERREUR DANS COMPARATIVE");
 			throw new Exception();
 		}
-		return p;
+		return new Arbre(new Token());
 	}
 	
+	/*********************************
+	 * Vérifie que la chaine de token qui suit est bien une expression logique
+	 * Une expression logique peut etre:
+	 * - un NOT expression logique : !L
+	 * - une comparaison simple: C
+	 * - C AND L
+	 * - C OR L
+	 * - si il ne reconnait rien, on renvoie un arbre vide, provoquera une erreur.
+	 *********************************/
 	private Arbre logical() throws Exception{
+		// CAS !L
 		if(look().Classe == TokenClass.TOK_NOT){
 			Arbre not = new Arbre(next());
 			Arbre log = logical();
@@ -247,6 +320,7 @@ public class Analyseur {
 		if(p.tok.Classe == TokenClass.TOK_NULL){
 			return new Arbre(new Token());
 		}
+		//CAS C OR L et C AND L
 		if(look().Classe == TokenClass.TOK_AND || look().Classe == TokenClass.TOK_OR){
 			Arbre a = new Arbre(next());
 			Arbre b = logical();
@@ -258,13 +332,15 @@ public class Analyseur {
 			System.err.println("ERREUR DANS LOGICAL");
 			throw new Exception();
 		}
+		//CAS C
 		return p;
 	}
 	
-	private Arbre expression() throws Exception{
-		return logical();
-	}
-	
+	/*********************************
+	 * Vérifie que la chaine de token qui suit est bien une affectation
+	 * Une affectation est de la forme IDENT = A:
+	 * si il ne reconnait rien, on renvoie un arbre vide, provoquera une erreur.
+	 *********************************/
 	private Arbre affectation() throws Exception{
 		if(look().Classe == TokenClass.TOK_IDENT){
 			if (symb.search(look().Value) != null){
@@ -273,7 +349,7 @@ public class Analyseur {
 				Arbre ident = new Arbre(variable);
 				if(look().Classe == TokenClass.TOK_AFF){
 					Arbre affect = new Arbre(next());
-					Arbre exp = expression();
+					Arbre exp = additive();
 					if (exp.tok.Classe != TokenClass.TOK_NULL){
 						affect.fils.add(ident);
 						affect.fils.add(exp);
@@ -291,6 +367,11 @@ public class Analyseur {
 		return new Arbre(new Token());		
 	}
 	
+	/*********************************
+	 * On récupére toute les fonctions et on stock les noms en mémoire.
+	 * Une fonction est de la forme: function nom_fonction(var nom_variable, ...){bloc_instructions}
+	 * Il peut y avoir aucune variable.
+	 *********************************/
 	private Arbre function() throws Exception{
 		Arbre funcs = new Arbre(new Token(TokenClass.TOK_RAC, "ORIGIN"));
 		Arbre func = new Arbre(new Token());
@@ -340,7 +421,17 @@ public class Analyseur {
 		}while(func.tok.Classe != TokenClass.TOK_NULL);
 		return funcs;
 	}
+
 	
+	/*********************************
+	 * Récupére un bloc d'instruction. Cela peut etre:
+	 * - une affectation
+	 * - une déclaration de variable
+	 * - un bloc if
+	 * - une boucle for
+	 * - une boucle while
+	 * - un return
+	 *********************************/
 	private Arbre instruction() throws Exception{
 		Arbre seq = new Arbre(new Token(TokenClass.TOK_SUIT, " => "));
 		Arbre instr = new Arbre(new Token());
@@ -389,7 +480,7 @@ public class Analyseur {
 					if(look().Classe == TokenClass.TOK_IF){
 						instr = new Arbre(next());
 						if(next().Classe == TokenClass.TOK_PO){
-							Arbre exp = expression();
+							Arbre exp = logical();
 							if(exp.tok.Classe != TokenClass.TOK_NULL){
 								if(next().Classe == TokenClass.TOK_PF && next().Classe == TokenClass.TOK_AO){
 									int mem = index;
@@ -444,7 +535,7 @@ public class Analyseur {
 								Arbre aff = affectation();
 								if(aff.tok.Classe != TokenClass.TOK_NULL){
 									if(next().Classe == TokenClass.TOK_PV){
-										Arbre exp = expression();
+										Arbre exp = logical();
 										if(exp.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_PV){
 											Arbre instrFor = affectation();
 											if(instrFor.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_PF && next().Classe == TokenClass.TOK_AO){
@@ -497,7 +588,7 @@ public class Analyseur {
 							if(look().Classe == TokenClass.TOK_WHILE){
 								instr = new Arbre(next());
 								if(next().Classe == TokenClass.TOK_PO){
-									Arbre condition = expression();
+									Arbre condition = logical();
 									if(condition.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_PF && next().Classe == TokenClass.TOK_AO){
 										int mem = index;
 										symb.push();
@@ -531,7 +622,7 @@ public class Analyseur {
 								//RETURN
 								if(look().Classe == TokenClass.TOK_RET){
 									instr = new Arbre(next());
-									Arbre exp = expression();
+									Arbre exp = additive();
 									if(exp.tok.Classe != TokenClass.TOK_NULL && next().Classe == TokenClass.TOK_PV){
 										instr.fils.add(exp);						
 										seq.fils.add(instr);
@@ -548,16 +639,5 @@ public class Analyseur {
 			}
 		}while(instr.tok.Classe != TokenClass.TOK_NULL && look().Classe != TokenClass.TOK_AF);
 		return seq;
-	}
-	
-	public ArrayList<Token> getTokTable(){
-		Token tok = new Token();
-		ArrayList<Token> tab = new ArrayList<Token>();
-		do{
-			tok = this.next();
-			tab.add(tok);
-		}while(tok.Classe != TokenClass.TOK_EOF);
-		return tab;
-	}
-	
+	}	
 }
