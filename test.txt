@@ -1,8 +1,7 @@
-function test(var n, var g){
-	var d;
-	return n + d - g;
+function somme(var a, var b){
+	return a+b;
 }
 function main(){
 	var i;
-	i = test(i, 5);
+	i = somme(3,2);
 }

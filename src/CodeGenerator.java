@@ -441,12 +441,12 @@ public class CodeGenerator {
 	 * @param a [Arbre]s
 	 */
 	protected void addAppel(Arbre a){
+		addLineCode("prep "+a.tok.Value+"F");
 		int nbArg = 0;
 		for(Arbre tmp : a.fils.get(0).fils){
 			pushElement(tmp);
 			nbArg++;
 		}
-		addLineCode("prep "+a.tok.Value+"F");
 		addLineCode("call "+nbArg);
 	}
 	
