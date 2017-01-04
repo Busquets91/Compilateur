@@ -1,0 +1,15 @@
+function mist(var n){
+	var j;
+	var result;
+	while( j < n ){
+		var tmp;
+		tmp = n - j;
+		result = tmp;
+		j = j + 1;
+	}
+	return result+1;
+}
+function main(){
+	var a;
+	a = mist(20);
+}

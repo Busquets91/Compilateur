@@ -2,6 +2,6 @@ function somme(var a, var b){
 	return a+b;
 }
 function main(){
-	var i;
-	i = somme(3,2);
+	var a;
+	a = somme(3,2);
 }

@@ -1,0 +1,29 @@
+.sommeF
+get 0
+get 1
+add.i
+ret
+.start
+push.i 0
+push.i 1
+push.i 0
+set 0
+.loop0
+get 0
+push.i 10
+cmplt.i
+jumpf endLoop0
+prep sommeF
+get 0
+get 1
+call 2
+set 1
+get 0
+push.i 1
+add.i
+set 0
+jump loop0
+.endLoop0
+drop
+drop
+halt

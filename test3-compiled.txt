@@ -1,0 +1,36 @@
+.mistF
+push.i 1
+push.i 2
+.loop0
+get 1
+get 0
+cmplt.i
+jumpf endLoop0
+push.i 3
+get 0
+get 1
+sub.i
+set 3
+get 3
+set 2
+get 1
+push.i 1
+add.i
+set 1
+drop
+jump loop0
+.endLoop0
+get 2
+push.i 1
+add.i
+ret
+drop
+drop
+.start
+push.i 0
+prep mistF
+push.i 20
+call 1
+set 0
+drop
+halt

@@ -1,0 +1,17 @@
+function main(){
+	var a;
+	a = 10-3*2+7/10;
+	if(a > 0){
+		var b;
+		b = 1;
+		a = a+b;
+	}
+	else{
+		var b;
+		b = -1;
+		a = a+b;
+	}
+	if(a == 2){
+		a = 11;
+	}
+}

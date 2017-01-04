@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 
 /**
@@ -599,22 +600,34 @@ public class CodeGenerator {
 	}
 
 	public static void main(String[] args) throws Exception {
-		//On lit le fichier contenant le code
-		Reader fic = new Reader("test.txt");
+		ArrayList<String> listFile = new ArrayList<String>();
+		Scanner sc = new Scanner(System.in);
+		listFile.add("test.txt");
+		listFile.add("test1.txt");
+		listFile.add("test2.txt");
+		listFile.add("test3.txt");
+		System.out.println("Entrez le nom du fichier à compiler (ou rien si aucun fichier) :");
+		String str = sc.nextLine();
+		if (str.length() > 0){
+			listFile.add(str);
+		}
 		
-		//On l'analyse
-		Analyseur anal = new Analyseur(fic.getString());
-		Arbre tst = anal.getArbre();
+		for(String tmp : listFile){
+			//On lit le fichier contenant le code
+			Reader fic = new Reader(tmp);
+			
+			//On l'analyse
+			Analyseur anal = new Analyseur(fic.getString());
+			Arbre tst = anal.getArbre();
+			
+			//On gÃ©nÃ¨re le code
+			CodeGenerator code = new CodeGenerator(tst, anal.getSymb());
+			code.genCode(code.getArbre());
+			//System.out.println(code.getCode());
 		
-		System.out.println(tst.print());
-		
-		//On gÃ©nÃ¨re le code
-		CodeGenerator code = new CodeGenerator(tst, anal.getSymb());
-		code.genCode(code.getArbre());
-		//System.out.println(code.getCode());
-	
-		//On Ã©crit le code dans un fichier
-		new Writer(fic.getNameFile()+"-compiled.txt", code.getCode());
+			//On Ã©crit le code dans un fichier
+			new Writer(fic.getNameFile()+"-compiled.txt", code.getCode());
+			System.out.println(tmp+" => "+fic.getNameFile()+"-compiled.txt");
+		}
 	}
-
 }

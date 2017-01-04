@@ -1,0 +1,10 @@
+function somme(var a, var b){
+	return a+b;
+}
+function main(){
+	var i;
+	var a;
+	for(i = 0; i < 10; i = i + 1){
+		a = somme(i,a);
+	}
+}

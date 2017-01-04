@@ -10,6 +10,5 @@ push.i 3
 push.i 2
 call 2
 set 0
-out.i
 drop
 halt

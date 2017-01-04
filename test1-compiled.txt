@@ -1,0 +1,47 @@
+.start
+push.i 0
+push.i 10
+push.i 3
+push.i 2
+mul.i
+push.i 7
+push.i 10
+div.i
+add.i
+sub.i
+set 0
+get 0
+push.i 0
+cmpgt.i
+jumpf else0
+.if0
+push.i 1
+push.i 1
+set 1
+get 0
+get 1
+add.i
+set 0
+drop
+.else0
+push.i 1
+get 0
+push.i 1
+sub.i
+set 1
+get 0
+get 1
+add.i
+set 0
+drop
+.endIf0
+get 0
+push.i 2
+cmpeq.i
+jumpf endIf1
+.if1
+push.i 11
+set 0
+.endIf1
+drop
+halt
