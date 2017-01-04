@@ -1,8 +1,8 @@
-function test(){
-	return 2;
+function test(var n, var g){
+	var d;
+	return n + d - g;
 }
 function main(){
 	var i;
-	i = test();
+	i = test(i, 5);
 }
-

@@ -160,7 +160,7 @@ public class CodeGenerator {
 	 */
 	protected void get(Arbre a){
 		//TODO rÃ©cupÃ©rer l'ident de la variable
-		addLineCode("get "+"ident "+a.tok.Value);
+		addLineCode("get "+a.tok.Value);
 	}
 	
 	/**
@@ -169,7 +169,7 @@ public class CodeGenerator {
 	 */
 	protected void set(Arbre a){
 		//TODO rÃ©cupÃ©rer l'ident de la variable
-		addLineCode("set "+"ident "+a.tok.Value);
+		addLineCode("set "+a.tok.Value);
 	}
 	
 	/**

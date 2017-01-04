@@ -1,10 +1,18 @@
 .testF
 push.i 2
+get 0
+get 2
+get 1
+sub.i
+add.i
 ret
+drop
 .start
 push.i 0
+get 0
+push.i 5
 prep testF
-call 0
+call 2
 set 0
 drop
 halt
